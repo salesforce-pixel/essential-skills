@@ -532,6 +532,39 @@ def extract_atlas_doc(url: str, timeout_seconds: int) -> Dict[str, Any]:
             req.dispose()
 
 
+def _is_transient_miss(result: Dict[str, Any]) -> bool:
+    """A failed extraction that looks like a bot-check / render timing miss
+    rather than a genuine empty page — worth one retry."""
+    if result.get("ok"):
+        return False
+    return (
+        result.get("strategy") in (None, "none")
+        or not (result.get("text") or "").strip()
+        or result.get("likelyShell")
+    )
+
+
+def extract_official_salesforce_doc_with_retry(
+    url: str, timeout_seconds: int, use_stealth: bool = False
+) -> Dict[str, Any]:
+    """Run the browser extractor, retrying once on a transient miss.
+
+    Modern /docs/platform/ pages occasionally trip reCAPTCHA or render late on a
+    cold headless load, returning no content. A single retry (preferring stealth
+    when available) clears it. The better of the two attempts is returned.
+    """
+    result = extract_official_salesforce_doc(url, timeout_seconds, use_stealth=use_stealth)
+    if not _is_transient_miss(result):
+        return result
+
+    retry_stealth = True if (stealth_sync is not None or Stealth is not None) else use_stealth
+    retry = extract_official_salesforce_doc(url, timeout_seconds, use_stealth=retry_stealth)
+    winner = retry if (retry.get("ok") or len(retry.get("text", "")) >= len(result.get("text", ""))) else result
+    winner["retriedAfterTransientMiss"] = True
+    winner["firstAttemptStrategy"] = result.get("strategy")
+    return winner
+
+
 def main() -> int:
     args = parse_args()
     kind = route_kind(args.url)
@@ -544,7 +577,7 @@ def main() -> int:
         result = extract_atlas_doc(args.url, args.timeout)
         result["routedVia"] = "atlas_json_content_api"
     else:
-        result = extract_official_salesforce_doc(args.url, args.timeout, use_stealth=args.stealth)
+        result = extract_official_salesforce_doc_with_retry(args.url, args.timeout, use_stealth=args.stealth)
         result["routedVia"] = "generic_official_salesforce_extractor"
 
     dump = json.dumps(result, indent=2 if args.pretty else None)

@@ -3,11 +3,16 @@ name: fetching-salesforce-docs
 description: "Official Salesforce documentation retrieval skill. Use when you need authoritative Salesforce docs from developer.salesforce.com, help.salesforce.com, architect.salesforce.com, admin.salesforce.com, or lightningdesignsystem.com, especially when pages are JS-heavy, shell-rendered, or hard to extract with naive fetching. Use to ground answers in official Salesforce sources instead of third-party blogs or summaries. TRIGGER when: user asks for official Salesforce documentation, Apex or API reference, LWC docs, Agentforce docs, setup or help articles, or any doc from a Salesforce-owned domain. DO NOT TRIGGER when: user is asking for a code change, deployment task, or anything not requiring documentation retrieval — use the appropriate sf-* skill instead."
 license: MIT
 metadata:
-  version: "1.3"
+  version: "1.4"
 ---
 
 <!--
 Changelog
+1.4 — Generic browser extractor now retries once on a transient miss (no content
+      extracted / shell-only body), preferring stealth when available. Modern
+      /docs/platform/ pages occasionally trip reCAPTCHA or render late on a cold
+      headless load; a single retry clears it. The better of the two attempts is
+      returned, flagged with retriedAfterTransientMiss + firstAttemptStrategy.
 1.3 — Legacy atlas docs (atlas.en-us.*.meta) now route to the JSON content API
       the AngularJS DocsApp uses, instead of browser rendering (the SPA does not
       hydrate headless — only the cookie-consent overlay paints, which previously
