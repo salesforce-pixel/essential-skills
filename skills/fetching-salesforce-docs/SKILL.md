@@ -3,11 +3,21 @@ name: fetching-salesforce-docs
 description: "Official Salesforce documentation retrieval skill. Use when you need authoritative Salesforce docs from developer.salesforce.com, help.salesforce.com, architect.salesforce.com, admin.salesforce.com, or lightningdesignsystem.com, especially when pages are JS-heavy, shell-rendered, or hard to extract with naive fetching. Use to ground answers in official Salesforce sources instead of third-party blogs or summaries. TRIGGER when: user asks for official Salesforce documentation, Apex or API reference, LWC docs, Agentforce docs, setup or help articles, or any doc from a Salesforce-owned domain. DO NOT TRIGGER when: user is asking for a code change, deployment task, or anything not requiring documentation retrieval — use the appropriate sf-* skill instead."
 license: MIT
 metadata:
-  version: "1.2"
+  version: "1.3"
 ---
 
 <!--
 Changelog
+1.3 — Legacy atlas docs (atlas.en-us.*.meta) now route to the JSON content API
+      the AngularJS DocsApp uses, instead of browser rendering (the SPA does not
+      hydrate headless — only the cookie-consent overlay paints, which previously
+      slipped through as a false-positive success). extract_salesforce_doc.py
+      gained extract_atlas_doc(): get_document descriptor -> get_document_content
+      with the .htm content id (the suffix is required or the endpoint returns
+      HTTP 200 + empty body). A specific section that returns empty now fails
+      loudly (ok:false) rather than substituting the document landing page.
+      Tightened shell detection so a cookie/consent-only body is treated as a
+      failed extraction.
 1.2 — Self-provisioning isolated runtime. First run of the extraction scripts
       now auto-creates the venv, installs deps, and downloads chromium (logged
       to stderr; stdout stays clean JSON). Fixed runtime_bootstrap re-exec so it
@@ -128,6 +138,28 @@ Use this playbook:
 - if the concept is missing, inspect official child links and follow the best matching 1–3 links
 - prefer exact concept pages over broad guide roots
 - legacy atlas pages are valid if they are the real official reference for the concept
+
+#### Legacy atlas docs (`atlas.en-us.*.meta`)
+
+These older guides (e.g. `atlas.en-us.sfdx_dev.meta`, `atlas.en-us.apexref.meta`,
+`atlas.en-us.api_asynch.meta`) are an AngularJS single-page app (`DocsApp`). The
+article is **not** in the initial HTML and the app **does not hydrate in headless
+Chromium** — a naive browser render returns only the cookie-consent overlay, which
+can look like a (wrong) success. `extract_salesforce_doc.py` auto-detects these
+URLs and fetches the JSON content API the app itself calls — no special flags
+needed; just pass the `.htm` URL:
+
+```bash
+python3 scripts/extract_salesforce_doc.py \
+  --url "https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_data_bulk.htm" --pretty
+```
+
+Notes:
+- A specific section that returns an empty body comes back as `ok:false` with an
+  `error` field (usually a renamed/removed page) — it does **not** silently fall
+  back to the document landing page. Trust the `ok` flag.
+- The underlying endpoint is `get_document_content/{deliverable}/{contentId}.htm/{locale}/{docVersion}`;
+  the `.htm` suffix on the content id is required or it returns HTTP 200 + empty body.
 
 ### 6. For `help.salesforce.com`
 

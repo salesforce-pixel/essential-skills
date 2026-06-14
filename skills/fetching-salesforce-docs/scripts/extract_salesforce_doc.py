@@ -27,10 +27,11 @@ Examples:
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import re
-from typing import Any, Dict
-from urllib.parse import urlparse
+from typing import Any, Dict, Optional
+from urllib.parse import urljoin, urlparse
 
 from runtime_bootstrap import maybe_reexec_in_sf_docs_runtime
 
@@ -73,6 +74,19 @@ WEAK_SHELL_TOKENS = [
     "cookie preferences",
 ]
 
+# A page whose body is dominated by the OneTrust cookie-consent overlay is a
+# failed extraction, not content. These banners are short (~700 chars) and
+# contain none of the STRONG_SHELL_TOKENS, so without this they slip through as
+# a false-positive success. Real doc pages that merely mention cookies are far
+# longer, so we only treat these as a shell below a generous length threshold.
+CONSENT_SHELL_TOKENS = [
+    "we use cookies on our website",
+    "accept all cookies",
+    "cookie consent manager",
+    "do not accept",
+]
+CONSENT_SHELL_MAX_LEN = 1500
+
 OFFICIAL_DOC_EXACT_HOSTS = {
     "salesforce.com",
     "lightningdesignsystem.com",
@@ -95,8 +109,11 @@ def looks_like_shell(title: str, text: str) -> bool:
     haystack = f"{title}\n{text}".lower()
     if any(token in haystack for token in STRONG_SHELL_TOKENS):
         return True
+    stripped = len(text.strip())
+    if any(token in haystack for token in CONSENT_SHELL_TOKENS) and stripped < CONSENT_SHELL_MAX_LEN:
+        return True
     if any(token in haystack for token in WEAK_SHELL_TOKENS):
-        return len(text.strip()) < 600
+        return stripped < 600
     return False
 
 
@@ -131,9 +148,16 @@ def is_official_salesforce_host(host: str) -> bool:
 
 
 def route_kind(url: str) -> str:
-    host = (urlparse(url).hostname or "").lower()
+    parsed = urlparse(url)
+    host = (parsed.hostname or "").lower()
     if host.endswith("help.salesforce.com"):
         return "help"
+    # Legacy "atlas" docs (e.g. atlas.en-us.sfdx_dev.meta) are an AngularJS
+    # single-page app (DocsApp) that injects the article via XHR and does not
+    # hydrate in headless Chromium. Route them to the JSON content API the app
+    # itself calls instead of trying to render them.
+    if host.endswith("developer.salesforce.com") and "/docs/atlas." in parsed.path:
+        return "atlas"
     if is_official_salesforce_host(host):
         return "official"
     raise SystemExit(f"Unsupported host for fetching-salesforce-docs extractor: {host or url}")
@@ -336,6 +360,178 @@ def extract_official_salesforce_doc(url: str, timeout_seconds: int, use_stealth:
             browser.close()
 
 
+_BLOCK_TAG_RE = re.compile(
+    r"</(?:p|div|li|ul|ol|tr|table|h[1-6]|section|article|pre|br|blockquote)\s*>",
+    re.IGNORECASE,
+)
+_SELF_CLOSE_BR_RE = re.compile(r"<br\s*/?>", re.IGNORECASE)
+_SCRIPT_STYLE_RE = re.compile(r"<(script|style)\b[^>]*>.*?</\1>", re.IGNORECASE | re.DOTALL)
+_TAG_RE = re.compile(r"<[^>]+>")
+_HREF_RE = re.compile(r'href\s*=\s*["\']([^"\']+)["\']', re.IGNORECASE)
+
+
+def html_to_text(content_html: str) -> str:
+    text = _SCRIPT_STYLE_RE.sub(" ", content_html or "")
+    text = _SELF_CLOSE_BR_RE.sub("\n", text)
+    text = _BLOCK_TAG_RE.sub("\n", text)
+    text = _TAG_RE.sub(" ", text)
+    text = html.unescape(text)
+    return normalize_text(text)
+
+
+def extract_atlas_links(content_html: str, base_url: str) -> list:
+    urls = []
+    seen = set()
+    for raw in _HREF_RE.findall(content_html or ""):
+        if not raw or raw.startswith(("javascript:", "mailto:", "#")):
+            continue
+        resolved = urljoin(base_url, raw)
+        if resolved not in seen:
+            seen.add(resolved)
+            urls.append(resolved)
+    return urls
+
+
+def parse_atlas_url(url: str) -> Dict[str, Optional[str]]:
+    """Pull the atlas document id and the .htm content id out of an atlas URL."""
+    parts = [seg for seg in urlparse(url).path.split("/") if seg]
+    atlas_id = next((seg for seg in parts if seg.startswith("atlas.")), None)
+    content_id = parts[-1] if parts and parts[-1].endswith(".htm") else None
+    return {"atlas_id": atlas_id, "content_id": content_id}
+
+
+def extract_atlas_doc(url: str, timeout_seconds: int) -> Dict[str, Any]:
+    """Fetch a legacy atlas doc via the JSON content API the DocsApp SPA uses.
+
+    Flow: get_document/<atlas_id> -> descriptor (deliverable, locale, version)
+    then get_document_content/<deliverable>/<content_id>/<locale>/<doc_version>.
+    The content id MUST keep its '.htm' suffix or the endpoint returns HTTP 200
+    with an empty body.
+    """
+    timeout_ms = timeout_seconds * 1000
+    host = (urlparse(url).hostname or "").lower()
+    parsed = parse_atlas_url(url)
+    atlas_id = parsed["atlas_id"]
+    content_id = parsed["content_id"]
+
+    if not atlas_id:
+        raise SystemExit(f"Could not parse atlas document id from URL: {url}")
+
+    docs_base = "https://developer.salesforce.com/docs/"
+    headers = {
+        "User-Agent": USER_AGENT,
+        "Accept": "application/json, text/plain, */*",
+        "Referer": url,
+    }
+
+    with sync_playwright() as p:
+        req = p.request.new_context(extra_http_headers=headers)
+        try:
+            descriptor_resp = req.get(docs_base + "get_document/" + atlas_id, timeout=timeout_ms)
+            descriptor = descriptor_resp.json()
+
+            deliverable = descriptor.get("deliverable")
+            locale = descriptor.get("locale") or "en-us"
+            version = descriptor.get("version") or {}
+            doc_version = version.get("doc_version") if isinstance(version, dict) else version
+
+            content_html = ""
+            title = None
+            content_status = None
+            content_url = None
+            section_requested = bool(content_id and deliverable and doc_version)
+            section_empty = False
+
+            if section_requested:
+                content_url = (
+                    f"{docs_base}get_document_content/{deliverable}/{content_id}/{locale}/{doc_version}"
+                )
+                # The endpoint occasionally returns HTTP 200 with an empty body
+                # for a transient miss; retry a couple times before giving up.
+                # A persistently empty body means the content id is invalid or
+                # renamed (the .htm in the URL no longer maps to a document).
+                for _ in range(3):
+                    content_resp = req.get(content_url, timeout=timeout_ms)
+                    content_status = content_resp.status
+                    body = content_resp.text()
+                    if body.strip():
+                        try:
+                            payload = json.loads(body)
+                            content_html = payload.get("content", "") or ""
+                            title = payload.get("title")
+                        except json.JSONDecodeError:
+                            content_html = body
+                        break
+                section_empty = not content_html.strip()
+
+            # Use the descriptor's own content ONLY for a genuine landing-page
+            # request (no specific .htm section). We must NOT substitute the
+            # landing page when a specific section was requested but came back
+            # empty — that would report the wrong page as a success.
+            if not section_requested and not content_html.strip():
+                content_html = descriptor.get("content", "") or ""
+                title = title or descriptor.get("title")
+
+            if section_empty:
+                doc_title = descriptor.get("doc_title") or descriptor.get("title") or "Untitled"
+                return {
+                    "ok": False,
+                    "url": url,
+                    "httpStatus": content_status,
+                    "title": doc_title,
+                    "host": host,
+                    "hostKind": "atlas",
+                    "strategy": "atlas-json-api",
+                    "selector": None,
+                    "likelyShell": False,
+                    "stealthRequested": False,
+                    "stealthAvailable": stealth_sync is not None or Stealth is not None,
+                    "stealthUsed": False,
+                    "text": "",
+                    "contentLinks": [],
+                    "childLinks": [],
+                    "candidateCount": 0,
+                    "atlasDocId": atlas_id,
+                    "atlasContentId": content_id,
+                    "atlasContentUrl": content_url,
+                    "error": (
+                        f"Atlas content endpoint returned an empty body (HTTP {content_status}) "
+                        f"for content id '{content_id}'. The page may have been renamed or removed; "
+                        f"verify the URL or browse the document at get_document/{atlas_id}."
+                    ),
+                }
+
+            title = title or descriptor.get("doc_title") or "Untitled"
+            text = html_to_text(content_html)
+            links = extract_atlas_links(content_html, url)
+            likely_shell = looks_like_shell(title, text)
+            ok = bool(text) and len(text) >= 300 and not likely_shell
+
+            return {
+                "ok": ok,
+                "url": url,
+                "httpStatus": content_status if content_status is not None else descriptor_resp.status,
+                "title": title,
+                "host": host,
+                "hostKind": "atlas",
+                "strategy": "atlas-json-api",
+                "selector": None,
+                "likelyShell": likely_shell,
+                "stealthRequested": False,
+                "stealthAvailable": stealth_sync is not None or Stealth is not None,
+                "stealthUsed": False,
+                "text": text,
+                "contentLinks": links[:200],
+                "childLinks": links[:200],
+                "candidateCount": 1 if text else 0,
+                "atlasDocId": atlas_id,
+                "atlasContentId": content_id,
+                "atlasContentUrl": content_url,
+            }
+        finally:
+            req.dispose()
+
+
 def main() -> int:
     args = parse_args()
     kind = route_kind(args.url)
@@ -344,6 +540,9 @@ def main() -> int:
         result = extract_help_salesforce(args.url, args.timeout, use_stealth=args.stealth)
         result["routedVia"] = "extract_help_salesforce"
         result.setdefault("hostKind", "help")
+    elif kind == "atlas":
+        result = extract_atlas_doc(args.url, args.timeout)
+        result["routedVia"] = "atlas_json_content_api"
     else:
         result = extract_official_salesforce_doc(args.url, args.timeout, use_stealth=args.stealth)
         result["routedVia"] = "generic_official_salesforce_extractor"
