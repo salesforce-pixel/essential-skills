@@ -3,11 +3,15 @@ name: fetching-salesforce-docs
 description: "Official Salesforce documentation retrieval skill. Use when you need authoritative Salesforce docs from developer.salesforce.com, help.salesforce.com, architect.salesforce.com, admin.salesforce.com, or lightningdesignsystem.com, especially when pages are JS-heavy, shell-rendered, or hard to extract with naive fetching. Use to ground answers in official Salesforce sources instead of third-party blogs or summaries. TRIGGER when: user asks for official Salesforce documentation, Apex or API reference, LWC docs, Agentforce docs, setup or help articles, or any doc from a Salesforce-owned domain. DO NOT TRIGGER when: user is asking for a code change, deployment task, or anything not requiring documentation retrieval — use the appropriate sf-* skill instead."
 license: MIT
 metadata:
-  version: "1.6"
+  version: "1.7"
 ---
 
 <!--
 Changelog
+1.7 — Hardened the atlas descriptor fetch: the get_document endpoint can return
+      an empty/non-JSON body on a transient miss, which previously crashed the
+      script with an unhandled exception (no JSON output, stack trace). It now
+      retries and, on ultimate failure, returns a clean ok:false with an error.
 1.6 — Fixed a shell-detection false negative: a long, valid article was flagged
       as a shell because a shell token matched a substring of real content
       ("loading" inside "downloading"). Shell tokens now match on word

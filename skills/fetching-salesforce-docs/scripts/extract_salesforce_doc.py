@@ -451,11 +451,55 @@ def extract_atlas_doc(url: str, timeout_seconds: int) -> Dict[str, Any]:
         "Referer": url,
     }
 
+    def _atlas_error(status, message):
+        return {
+            "ok": False,
+            "url": url,
+            "httpStatus": status,
+            "title": "Untitled",
+            "host": host,
+            "hostKind": "atlas",
+            "strategy": "atlas-json-api",
+            "selector": None,
+            "likelyShell": False,
+            "stealthRequested": False,
+            "stealthAvailable": stealth_sync is not None or Stealth is not None,
+            "stealthUsed": False,
+            "text": "",
+            "contentLinks": [],
+            "childLinks": [],
+            "candidateCount": 0,
+            "atlasDocId": atlas_id,
+            "atlasContentId": content_id,
+            "atlasContentUrl": None,
+            "error": message,
+        }
+
     with sync_playwright() as p:
         req = p.request.new_context(extra_http_headers=headers)
         try:
-            descriptor_resp = req.get(docs_base + "get_document/" + atlas_id, timeout=timeout_ms)
-            descriptor = descriptor_resp.json()
+            # The descriptor endpoint, like the content endpoint, occasionally
+            # returns an empty / non-JSON body on a transient miss. Retry before
+            # giving up, and fail cleanly (ok:false) rather than crashing.
+            descriptor = None
+            descriptor_status = None
+            for _ in range(3):
+                descriptor_resp = req.get(docs_base + "get_document/" + atlas_id, timeout=timeout_ms)
+                descriptor_status = descriptor_resp.status
+                body = descriptor_resp.text()
+                if body.strip():
+                    try:
+                        descriptor = json.loads(body)
+                        break
+                    except json.JSONDecodeError:
+                        descriptor = None
+            if descriptor is None:
+                return _atlas_error(
+                    descriptor_status,
+                    f"Atlas descriptor endpoint returned an empty or non-JSON body "
+                    f"(HTTP {descriptor_status}) for get_document/{atlas_id}. Likely a "
+                    f"transient miss; retry, or verify the atlas document id.",
+                )
 
             deliverable = descriptor.get("deliverable")
             locale = descriptor.get("locale") or "en-us"
