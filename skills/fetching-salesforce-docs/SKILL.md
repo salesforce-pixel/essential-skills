@@ -3,11 +3,16 @@ name: fetching-salesforce-docs
 description: "Official Salesforce documentation retrieval skill. Use when you need authoritative Salesforce docs from developer.salesforce.com, help.salesforce.com, architect.salesforce.com, admin.salesforce.com, or lightningdesignsystem.com, especially when pages are JS-heavy, shell-rendered, or hard to extract with naive fetching. Use to ground answers in official Salesforce sources instead of third-party blogs or summaries. TRIGGER when: user asks for official Salesforce documentation, Apex or API reference, LWC docs, Agentforce docs, setup or help articles, or any doc from a Salesforce-owned domain. DO NOT TRIGGER when: user is asking for a code change, deployment task, or anything not requiring documentation retrieval — use the appropriate sf-* skill instead."
 license: MIT
 metadata:
-  version: "1.5"
+  version: "1.6"
 ---
 
 <!--
 Changelog
+1.6 — Fixed a shell-detection false negative: a long, valid article was flagged
+      as a shell because a shell token matched a substring of real content
+      ("loading" inside "downloading"). Shell tokens now match on word
+      boundaries, and any page with substantial extracted text
+      (>= SUBSTANTIAL_CONTENT_LEN) is never treated as a shell.
 1.5 — Expanded the supported-host allowlist to all Salesforce-owned documentation
       domains: MuleSoft (*.mulesoft.com), Tableau (*.tableau.com), Slack
       (*.slack.com, *.slack.dev), and Heroku (*.heroku.com). These route to the

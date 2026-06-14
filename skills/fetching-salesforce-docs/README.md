@@ -4,11 +4,13 @@
 
 `fetching-salesforce-docs` is a **prompt-only skill**.
 
-It gives a practical retrieval playbook for official Salesforce docs on the public web, especially when:
+It gives a practical retrieval playbook for official Salesforce-owned docs on the public web, especially when:
 - `developer.salesforce.com` pages are JS-heavy
+- legacy `developer.salesforce.com/docs/atlas.*` guides don't render headless (AngularJS DocsApp)
 - `help.salesforce.com` pages return shell content
 - `architect.salesforce.com` / `admin.salesforce.com` pages need browser-rendered extraction
 - `lightningdesignsystem.com` pages contain official SLDS guidance
+- Salesforce-owned product docs are involved: MuleSoft (`*.mulesoft.com`), Tableau (`*.tableau.com`), Slack (`*.slack.com`, `*.slack.dev`), Heroku (`*.heroku.com`)
 - the real answer is on a child page, not the guide homepage
 
 ## What it is not
@@ -39,8 +41,13 @@ python3 skills/fetching-salesforce-docs/scripts/extract_salesforce_doc.py \
 ```
 
 Behavior:
-- automatically routes `help.salesforce.com` URLs into the dedicated Help extractor
-- supports official Salesforce-owned doc hosts such as `developer.salesforce.com`, `architect.salesforce.com`, `admin.salesforce.com`, `lightningdesignsystem.com`, and other official Salesforce documentation pages
+- automatically routes by URL:
+  - `help.salesforce.com` → the dedicated Help extractor
+  - `developer.salesforce.com/docs/atlas.*` (legacy AngularJS guides) → the JSON content API the DocsApp itself uses, since these don't render headless
+  - all other supported hosts → the browser-rendered extractor
+- supports Salesforce-owned doc hosts: `developer.salesforce.com`, `help.salesforce.com`, `architect.salesforce.com`, `admin.salesforce.com`, `lightningdesignsystem.com`, plus Salesforce-owned product docs (`*.mulesoft.com`, `*.tableau.com`, `*.slack.com`, `*.slack.dev`, `*.heroku.com`)
+- retries once automatically on a transient miss (e.g. a cold-load reCAPTCHA or late render), preferring stealth when available
+- returns JSON with an `ok` flag — trust it; failed/empty/shell extractions come back `ok:false` (often with an `error`) rather than as a false-positive success
 - supports optional best-effort stealth mode via `--stealth`
 
 Dependencies for the helper scripts live in:

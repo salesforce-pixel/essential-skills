@@ -87,6 +87,11 @@ CONSENT_SHELL_TOKENS = [
 ]
 CONSENT_SHELL_MAX_LEN = 1500
 
+# A page with this much extracted text is a real article, not a loading/error
+# shell — shells (spinners, soft-404s, cookie banners) are inherently short.
+# This guards against shell tokens incidentally appearing inside long content.
+SUBSTANTIAL_CONTENT_LEN = 1500
+
 # Salesforce-owned documentation domains. Includes Salesforce core plus the
 # Salesforce-owned product families (MuleSoft, Tableau, Slack, Heroku). Bare
 # apex domains go in the EXACT set; subdomains are matched via the suffixes.
@@ -118,14 +123,23 @@ def normalize_text(text: str) -> str:
     return text.strip()
 
 
+def _has_token(haystack: str, tokens) -> bool:
+    # Word-boundary match so e.g. "loading" does not match inside "downloading".
+    return any(re.search(r"\b" + re.escape(token) + r"\b", haystack) for token in tokens)
+
+
 def looks_like_shell(title: str, text: str) -> bool:
-    haystack = f"{title}\n{text}".lower()
-    if any(token in haystack for token in STRONG_SHELL_TOKENS):
-        return True
     stripped = len(text.strip())
-    if any(token in haystack for token in CONSENT_SHELL_TOKENS) and stripped < CONSENT_SHELL_MAX_LEN:
+    # Substantial content is a real article, never a shell — even if a shell-ish
+    # word happens to appear somewhere in it.
+    if stripped >= SUBSTANTIAL_CONTENT_LEN:
+        return False
+    haystack = f"{title}\n{text}".lower()
+    if _has_token(haystack, STRONG_SHELL_TOKENS):
         return True
-    if any(token in haystack for token in WEAK_SHELL_TOKENS):
+    if _has_token(haystack, CONSENT_SHELL_TOKENS) and stripped < CONSENT_SHELL_MAX_LEN:
+        return True
+    if _has_token(haystack, WEAK_SHELL_TOKENS):
         return stripped < 600
     return False
 
