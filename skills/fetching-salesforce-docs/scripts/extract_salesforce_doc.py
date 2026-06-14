@@ -87,14 +87,27 @@ CONSENT_SHELL_TOKENS = [
 ]
 CONSENT_SHELL_MAX_LEN = 1500
 
+# Salesforce-owned documentation domains. Includes Salesforce core plus the
+# Salesforce-owned product families (MuleSoft, Tableau, Slack, Heroku). Bare
+# apex domains go in the EXACT set; subdomains are matched via the suffixes.
 OFFICIAL_DOC_EXACT_HOSTS = {
     "salesforce.com",
     "lightningdesignsystem.com",
+    "mulesoft.com",
+    "tableau.com",
+    "slack.com",
+    "slack.dev",
+    "heroku.com",
 }
 
 OFFICIAL_DOC_SUFFIXES = (
     ".salesforce.com",
     ".lightningdesignsystem.com",
+    ".mulesoft.com",
+    ".tableau.com",
+    ".slack.com",
+    ".slack.dev",
+    ".heroku.com",
 )
 
 

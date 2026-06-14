@@ -3,11 +3,15 @@ name: fetching-salesforce-docs
 description: "Official Salesforce documentation retrieval skill. Use when you need authoritative Salesforce docs from developer.salesforce.com, help.salesforce.com, architect.salesforce.com, admin.salesforce.com, or lightningdesignsystem.com, especially when pages are JS-heavy, shell-rendered, or hard to extract with naive fetching. Use to ground answers in official Salesforce sources instead of third-party blogs or summaries. TRIGGER when: user asks for official Salesforce documentation, Apex or API reference, LWC docs, Agentforce docs, setup or help articles, or any doc from a Salesforce-owned domain. DO NOT TRIGGER when: user is asking for a code change, deployment task, or anything not requiring documentation retrieval — use the appropriate sf-* skill instead."
 license: MIT
 metadata:
-  version: "1.4"
+  version: "1.5"
 ---
 
 <!--
 Changelog
+1.5 — Expanded the supported-host allowlist to all Salesforce-owned documentation
+      domains: MuleSoft (*.mulesoft.com), Tableau (*.tableau.com), Slack
+      (*.slack.com, *.slack.dev), and Heroku (*.heroku.com). These route to the
+      generic browser extractor, which handles them as-is.
 1.4 — Generic browser extractor now retries once on a transient miss (no content
       extracted / shell-only body), preferring stealth when available. Modern
       /docs/platform/ pages occasionally trip reCAPTCHA or render late on a cold
@@ -46,7 +50,7 @@ Optional extraction scripts are available in `scripts/` — see the Reference Fi
 
 | | |
 |---|---|
-| **In scope** | Official Salesforce doc retrieval: Apex, API, LWC, metadata, Agentforce, setup articles, SLDS, architect/admin guidance |
+| **In scope** | Official Salesforce-owned doc retrieval: Apex, API, LWC, metadata, Agentforce, setup articles, SLDS, architect/admin guidance, plus Salesforce-owned product docs (MuleSoft, Tableau, Slack, Heroku) |
 | **Out of scope** | Third-party blogs, PDF fallback, local corpus indexing, benchmark workflows, generating code or metadata |
 
 ## Required Inputs
@@ -77,6 +81,7 @@ Prefer Salesforce-owned documentation sources:
 - `architect.salesforce.com`
 - `admin.salesforce.com`
 - `lightningdesignsystem.com`
+- Salesforce-owned product docs: `*.mulesoft.com` (MuleSoft), `*.tableau.com` (Tableau), `*.slack.com` / `*.slack.dev` (Slack), `*.heroku.com` (Heroku)
 - other official Salesforce documentation pages when Salesforce uses them as the source of truth
 
 Avoid third-party blogs, videos, or summary articles unless the user explicitly asks for them.
