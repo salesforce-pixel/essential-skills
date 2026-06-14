@@ -54,6 +54,34 @@ def _log(message: str) -> None:
     print(f"[fetching-salesforce-docs] {message}", file=sys.stderr, flush=True)
 
 
+def _venv_package_hint() -> str:
+    if sys.platform.startswith("linux"):
+        return "On Debian/Ubuntu install it with: sudo apt install python3-venv python3-pip"
+    if sys.platform == "darwin":
+        return "On macOS install Python via: brew install python (or python.org)"
+    if os.name == "nt":
+        return "On Windows install Python from python.org (check 'Add python.exe to PATH')"
+    return "Install a Python 3.8+ build that includes the venv and pip modules."
+
+
+def check_runtime_prerequisites() -> None:
+    """Fail early with an actionable message when the host Python can't build
+    the isolated venv (too old, or missing venv/ensurepip — common on Debian,
+    where venv ships in the separate python3-venv package)."""
+    import importlib.util
+
+    if sys.version_info < (3, 8):
+        raise RuntimeError(
+            f"Python 3.8+ is required, but this is {sys.version_info.major}."
+            f"{sys.version_info.minor}. {_venv_package_hint()}"
+        )
+    if importlib.util.find_spec("ensurepip") is None:
+        raise RuntimeError(
+            "This Python is missing the 'ensurepip'/'venv' support needed to "
+            f"create the isolated runtime. {_venv_package_hint()}"
+        )
+
+
 def provision_sf_docs_runtime() -> bool:
     """Create the isolated venv, install deps, and fetch the chromium browser.
 
@@ -67,6 +95,7 @@ def provision_sf_docs_runtime() -> bool:
     env = prepare_sf_docs_runtime_env()
 
     if not runtime_python.exists():
+        check_runtime_prerequisites()
         _log(f"Creating isolated runtime venv at {venv_root} (one-time setup)...")
         runtime_root.mkdir(parents=True, exist_ok=True)
         venv.EnvBuilder(with_pip=True).create(str(venv_root))
