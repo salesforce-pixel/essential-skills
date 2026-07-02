@@ -43,7 +43,7 @@ curl -fsSL https://github.com/salesforce-pixel/essential-skills/archive/refs/hea
 
 > Replace `agentscript` with any other skill folder name from the table above (e.g. `crafting-demo-data`, `fetching-salesforce-docs`).
 
-Both one-liners overwrite an existing copy with the latest version from `main` — re-run them any time to update.
+Both one-liners are safe to re-run any time to update: they never touch other skills already in `~/.claude/skills/`, and they overwrite every file the new version ships with the latest content from `main`. The one thing plain `tar` extraction *doesn't* do is delete files a newer version removed — if a skill's file layout changes, a stale leftover file could remain alongside the new one. For a guaranteed byte-for-byte clean overwrite, use the `rsync --delete` option below instead.
 
 ### Other install options
 
