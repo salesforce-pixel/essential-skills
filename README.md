@@ -8,6 +8,7 @@ A *skill* is a folder containing a `SKILL.md` (instructions + metadata) and any 
 
 | Skill | What it does |
 |-------|--------------|
+| [`agentscript`](skills/agentscript) | Authoritative Salesforce Agent Script (AgentScript) language reference — syntax, blocks, flow of control, model configuration, patterns, complete example agents, and agent metadata/package.xml deployment reference. Grounds any `.agent` file you write or review against correct syntax instead of relying on memory. |
 | [`crafting-demo-data`](skills/crafting-demo-data) | Populates and refreshes Salesforce **demo** orgs with realistic, story-coherent data. CREATE new narrative-coherent records (schema-first, dependency-ordered, idempotent via External ID + upsert) or REFRESH stale data in place (roll close dates forward, re-time activities). Org-safety check refuses to write to production; every created record is tagged for clean teardown. |
 | [`fetching-salesforce-docs`](skills/fetching-salesforce-docs) | Reliably retrieves official Salesforce documentation (developer.salesforce.com, help.salesforce.com, architect/admin, Lightning Design System), including JS-heavy and shell-rendered pages, via a browser-rendered extractor. Self-provisions an isolated Python + Playwright runtime on first use. |
 
