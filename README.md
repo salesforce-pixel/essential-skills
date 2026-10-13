@@ -8,6 +8,7 @@ A *skill* is a folder containing a `SKILL.md` (instructions + metadata) and any 
 
 | Skill | What it does |
 |-------|--------------|
+| [`afagent-metadata-helper`](skills/afagent-metadata-helper) | Retrieves, deploys, and versions **Agentforce agents** as metadata. Picks between the v68 types (`AiAgentDefinition` / `AiAgentDefinitionVersion`) and the v67-and-earlier types (`Bot`, `BotVersion`, `GenAiPlannerBundle`, `AiAuthoringBundle`), resolves version naming, builds `package.xml` manifests, and separates **draft** deploys from **publish** (which commits a permanent version). Includes verified workarounds for CLI/doc gaps and known retrieve/deploy errors. |
 | [`agentscript`](skills/agentscript) | Authoritative Salesforce Agent Script (AgentScript) language reference — syntax, blocks, flow of control, model configuration, voice/modality configuration, patterns, complete example agents, and agent metadata/package.xml deployment reference (API v68 and v67-earlier). Grounds any `.agent` file you write or review against correct syntax instead of relying on memory. |
 | [`crafting-demo-data`](skills/crafting-demo-data) | Populates and refreshes Salesforce **demo** orgs with realistic, story-coherent data. CREATE new narrative-coherent records (schema-first, dependency-ordered, idempotent via External ID + upsert) or REFRESH stale data in place (roll close dates forward, re-time activities). Org-safety check refuses to write to production; every created record is tagged for clean teardown. |
 | [`fetching-salesforce-docs`](skills/fetching-salesforce-docs) | Reliably retrieves official Salesforce documentation (developer.salesforce.com, help.salesforce.com, architect/admin, Lightning Design System), including JS-heavy and shell-rendered pages, via a browser-rendered extractor. Self-provisions an isolated Python + Playwright runtime on first use. |
@@ -41,7 +42,7 @@ curl -fsSL https://github.com/salesforce-pixel/essential-skills/archive/refs/hea
   | tar -xz --strip-components=2 -C ~/.claude/skills essential-skills-main/skills/agentscript
 ```
 
-> Replace `agentscript` with any other skill folder name from the table above (e.g. `crafting-demo-data`, `fetching-salesforce-docs`).
+> Replace `agentscript` with any other skill folder name from the table above (e.g. `afagent-metadata-helper`, `crafting-demo-data`, `fetching-salesforce-docs`).
 
 Both one-liners are safe to re-run any time to update: they never touch other skills already in `~/.claude/skills/`, and they overwrite every file the new version ships with the latest content from `main`. The one thing plain `tar` extraction *doesn't* do is delete files a newer version removed — if a skill's file layout changes, a stale leftover file could remain alongside the new one. For a guaranteed byte-for-byte clean overwrite, use the `rsync --delete` option below instead.
 
