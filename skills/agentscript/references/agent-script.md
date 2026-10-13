@@ -45,7 +45,9 @@ system:
 
 config:
     agent_name: "HelloWorldBot"
-    default_agent_user: "hello@world.com"
+
+access:
+    default_agent_user: "agent_user1@mycompanyname.com"
 
 language:
     default_locale: "en_US"
@@ -72,7 +74,7 @@ Among other compelling features, you can see in the above reasoning instructions
 Want to build Agent Script agents using an agent skill or with Agentforce Vibes? Check out these resources!
 
 - [Skills in Agentforce Vibes](https://developer.salesforce.com/docs/platform/einstein-for-devs/guide/skills.html) — A page describing how skills are used with Agentforce Vibes.
-- [Agentforce Vibes Library](https://github.com/forcedotcom/afv-library) — A curated collection of Salesforce agent skills for building applications using any AI tool that supports skills.
+- [Salesforce Skills Library](https://github.com/forcedotcom/afv-library) — A curated collection of Salesforce agent skills for building applications using any AI tool that supports skills.
 - [Agentforce Development Skill](https://github.com/forcedotcom/afv-library/tree/main/skills/developing-agentforce) — The specific skill (located within the Agentforce Vibes Library) designed for building, modifying, debugging, and deploying Agentforce agents using Agent Script.
 
 ## Next Steps
@@ -86,5 +88,10 @@ To learn more about Agent Script, review these topics.
 - [Flow of Control](./ascript-flow.md)
 - [Agent Script Patterns](./patterns/ascript-patterns.md)
 - [Agent Script Examples](./ascript-examples.md)
-- [Manage Agent Script Agents](./ascript-manage.md)
 - [Agent Script Reference](reference/ascript-reference.md)
+
+## See Also
+
+- [Manage Agent Script Agents](./ascript-manage.md)
+- _Trailhead_: [Programmatic Instructions in Agentforce](https://trailhead.salesforce.com/content/learn/modules/programmatic-instructions-in-agentforce)
+- _Trailhead_: [Agent Script Basics](https://trailhead.salesforce.com/content/learn/modules/agent-script-basics)

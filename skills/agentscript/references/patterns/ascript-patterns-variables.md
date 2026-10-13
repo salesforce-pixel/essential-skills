@@ -115,3 +115,4 @@ You can use slot-filling for top-level action inputs (which are called by the LL
 - Reference: [Variables](../reference/ascript-ref-variables.md)
 - Reference: [Conditional Expressions](../reference/ascript-ref-expressions.md)
 - Reference: [Actions](../reference/ascript-ref-actions.md)
+- _Trailhead_: [Agent Script Basics: Manage State Across a Multi-Turn Conversation](https://trailhead.salesforce.com/content/learn/modules/agent-script-basics)

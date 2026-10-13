@@ -88,3 +88,4 @@ However, you can define another subagent as the starting subagent instead (in Ag
 - Pattern: [Transitions](ascript-patterns-transitions.md)
 - Reference: [Start Agent Block](../ascript-blocks.md#start-agent-block)
 - Reference: [Flow of Control](../ascript-flow.md)
+- _Trailhead_: [Agent Script Basics: Route and Gate Conversations with Agent Script](https://trailhead.salesforce.com/content/learn/modules/agent-script-basics)

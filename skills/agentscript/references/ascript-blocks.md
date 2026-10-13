@@ -43,7 +43,7 @@ The config block contains configuration parameters that define the agent.
 | Parameter                    | Description                                                                                                                                                                                                                                                                     |
 | :--------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `developer_name`             | The Salesforce API name of the agent (max 80 chars). Must start with a letter, contain only alphanumeric and underscores, and can't end with underscore or have consecutive underscores. Must be unique in your org - you can't have two agents with the same `developer_name`. |
-| `default_agent_user`         | API name or ID of the default Salesforce user that is used to run this agent. Required for AgentforceServiceAgent, ignored for AgentforceEmployeeAgent.                                                                                                                         |
+| ~~`default_agent_user`~~     | Deprecated in this block. Specify `default_agent_user` in the [Access Block](#access-block).                                                                                                                                                                                    |
 | `agent_label`                | Optional. The agent's label, displayed in the UI. Auto-generated from `developer_name` if not provided.                                                                                                                                                                         |
 | `description`                | Description of the agent's goals and purpose.                                                                                                                                                                                                                                   |
 | `company`                    | Optional. Information about your company.                                                                                                                                                                                                                                       |
@@ -52,15 +52,77 @@ The config block contains configuration parameters that define the agent.
 | `agent_type`                 | Optional. The type of agent. Currently, allowed values are `AgentforceServiceAgent` (default) or `AgentforceEmployeeAgent`. Set automatically when you create an agent from a template.                                                                                         |
 | `enable_enhanced_event_logs` | Optional. Indicates whether to enable conversation logging for debugging and monitoring. Allowed values are `True` or `False`. Default: `False`.                                                                                                                                |
 | `user_locale`                | Optional. User locale setting.                                                                                                                                                                                                                                                  |
+| `runtime`                    | Optional. Sub-block that controls the agent's runtime behavior, such as streaming, citations, and groundedness checks. See [Runtime Sub-Block](#runtime-sub-block).                                                                                                             |
+| `file_upload`                | Optional. Sub-block that controls how the agent handles files uploaded by the customer during a conversation. See [File Upload Sub-Block](#file-upload-sub-block).                                                                                                              |
 
 ### Example Config Block
 
 ```sfdocs-code {"lang":"agentscript", "title": "Config Block"}
 config:
     developer_name: "Demo_Agent_1"
-    default_agent_user: "digitalagent.demo@salesforce.com"
     agent_label: "Demo Agent"
     description: "This is my demo agent"
+```
+
+## Runtime Sub-Block
+
+The `runtime` block is a sub-block of [Config](#config-block) that controls the agent's runtime behavior.
+
+| Parameter               | Description                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| :---------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `streaming`             | Controls whether the agent's response is streamed to the client incrementally as it's produced. When `False`, the response is delivered as a single chunk.**When to use:** Leave on (or omit) for interactive chat and voice channels where customers expect the reply to appear progressively. Set to `False` for clients or integrations that only consume a single completed message.                                              |
+| `thought_chunks`        | Controls whether the agent's step-by-step thinking is streamed alongside its responses. When `True`, clients that render "thinking" output can display it during the turn.**When to use:** Enable when your client renders reasoning to the customer or to developers (for example, an "agent is thinking" panel or a debug view). Disable for customer-facing surfaces where exposing internal reasoning is undesirable.             |
+| `citation`              | Controls the citation-enrichment post-processing step, which annotates knowledge-based answers with references to their source. Set to `False` to skip citation enrichment.**When to use:** Leave on for knowledge-grounded agents where customers benefit from seeing or clicking through to the source. Disable for channels that can't render citations, or when the extra post-processing latency isn't worth it.                 |
+| `groundedness`          | By default, Agentforce checks the LLM's responses against source content. This extra step takes some time but reduces the chance of hallucinations. Set to `False` to turn this check off.**When to use:** Leave on for knowledge-heavy agents where reducing hallucinations matters. Disable when you need faster responses and have accepted the tradeoff, or when you've confirmed the check isn't adding value for your use case. |
+| `reset_to_initial_node` | When `True`, each new customer turn restarts at the start_agent block, instead of resuming where the previous turn left off.**When to use:** Enable for stateless, one-shot Q&A or planner-style agents that should re-plan from scratch every turn. Leave off (the default) for multi-turn flows that need to resume mid-conversation.                                                                                               |
+
+```sfdocs-code {"lang":"agentscript", "title": "Runtime Block"}
+config:
+    developer_name: "Demo_Agent_1"
+    runtime:
+        streaming: True
+        thought_chunks: False
+        citation: True
+        groundedness: True
+        reset_to_initial_node: False
+```
+
+## File Upload Sub-Block
+
+The `file_upload` block, nested inside `config`, controls how the agent handles files that the customer uploaded during a conversation.
+
+| Parameter | Description                                                                                                                           |
+| :-------- | :------------------------------------------------------------------------------------------------------------------------------------ |
+| `mode`    | Required. [How the agent handles uploaded](#allowed-mode-values) files. Allowed values are `auto`, `managed`, `disabled`, or `error`. |
+| `message` | Optional. A message shown to the customer if uploads aren't successful.                                                               |
+
+### Allowed `mode` values
+
+- **`auto`** — Default file handling. Uploaded files are made available to the agent using standard behavior.
+- **`managed`** — Use this mode when you want fine-grained control over which uploaded files reach which subagent. This is the mode that pairs with slice syntax on `@system_variables.uploaded_files`, so you can pass a specific batch (for example, `@system_variables.uploaded_files[0:5]`) into an individual subagent.
+- **`disabled`** — Uploads are rejected without displaying a message to the customer.
+- **`error`** — Uploads are rejected and treated as an error. If provided, the message in `message` is shown to the customer. If `message` isn't provided, Agentforce generates a message.
+
+```sfdocs-code {"lang":"agentscript", "title": "Config Block with File Upload"}
+config:
+    developer_name: "Support_Agent"
+    agent_label: "Customer Support Agent"
+    file_upload:
+        mode: "managed"
+        message: "Something went wrong. Try again."
+```
+
+## Access Block
+
+The access block defines the agent's default user.
+
+| Parameter            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| :------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `default_agent_user` | The agent user's username, which is in the form of an email address. `username` is a field on the [User](https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_user.htm) object. You can also see a user's username in Setup. Required for [Agentforce Service agents](https://help.salesforce.com/s/articleView?id=ai.service_agent_setup.htm&type=5). An agent runs in the context of a user, and the user's permissions grant or deny access to Salesforce resources and data. |
+
+```sfdocs-code {"lang":"agentscript", "title": "Example Access Block"}
+access:
+    default_agent_user: "service@example.com"
 ```
 
 ## Variables Block
@@ -88,9 +150,89 @@ language:
 
 For a list of supported languages, see [Agentforce Language Support](https://help.salesforce.com/s/articleView?id=ai.agent_language_support.htm).
 
+## Modality Block
+
+The modality block configures agent behavior for a specific modality. The current allowed modality is `voice`. Use `modality voice:` to control how the agent sounds — its voice, speaking speed, pronunciation of specialized terms, and how it handles turn-taking on a live call.
+
+```sfdocs-code {"lang":"agentscript", "title": "Modality Block"}
+modality voice:
+    outbound:
+        persona_id: "<voice identifier>"
+        model:
+            parameters:
+                speed: 0.9
+```
+
+By default, a voice agent uses the ElevenLabs v3 Conversational model.
+
+- To select a different voice model, see [Configure Voice Models in Agent Script](./ascript-voice.md).
+- To see the complete voice catalog, see [Voice Catalog for Agentforce Voice](./ascript-voice-catalog.md).
+
+### Voice Variables
+
+The `voice` variant supports these variables. All variables are optional except `voice_id` when configuring a live voice channel.
+
+| Variable                         | Type     | Range     | Description                                                                                                                                                            |
+| :------------------------------- | :------- | :-------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `voice_id`                       | string   | —         | Unique identifier for the outbound voice (for example, `"UgBBYS2sOqTuMpoF3BR0"`).                                                                                      |
+| `outbound_speed`                 | number   | 0.5 – 2.0 | Speech rate. `1.0` is normal; lower is slower, higher is faster.                                                                                                       |
+| `outbound_style_exaggeration`    | number   | 0.0 – 1.0 | How strongly the voice expresses its style. Higher values are more expressive; lower values are flatter and more consistent.                                           |
+| `inbound_filler_words_detection` | boolean  | —         | When `True`, filler words (like "um", "uh") in the customer's speech are detected and ignored.                                                                         |
+| `inbound_keywords`               | block    | —         | Keyword boost list. Contains a `keywords` sequence of strings that improves recognition for domain-specific terms.                                                     |
+| `pronunciation_dict`             | sequence | —         | Custom pronunciations for specialized words or names. Each entry has `grapheme` (written form), `phoneme` (phonetic spelling), and `type` (either `"IPA"` or `"CMU"`). |
+| `outbound_filler_sentences`      | sequence | —         | Short "thinking" phrases the agent says while an action is running, so the customer doesn't hear dead air. Each entry has a `waiting` list of strings.                 |
+| `additional_configs`             | block    | —         | Container for `speak_up_config`, `endpointing_config`, and `beepboop_config`. See [Additional Configs](#additional-configs).                                           |
+
+### Additional Configs
+
+The `additional_configs` block groups three sub-configurations that fine-tune turn-taking behavior on a live call.
+
+| Sub-config           | Variable                          | Type   | Range          | Description                                                                                                               |
+| :------------------- | :-------------------------------- | :----- | :------------- | :------------------------------------------------------------------------------------------------------------------------ |
+| `speak_up_config`    | `speak_up_first_wait_time_ms`     | number | 10000 – 300000 | How long to wait, in milliseconds, before speaking up for the first time after the customer goes silent.                  |
+| `speak_up_config`    | `speak_up_follow_up_wait_time_ms` | number | 10000 – 300000 | How long to wait, in milliseconds, before speaking up again if the customer is still silent.                              |
+| `speak_up_config`    | `speak_up_message`                | string | —              | The message the agent says when it speaks up.                                                                             |
+| `endpointing_config` | `max_wait_time_ms`                | number | 500 – 60000    | Maximum time, in milliseconds, to wait for the customer to continue speaking before treating the turn as complete.        |
+| `beepboop_config`    | `max_wait_time_ms`                | number | 500 – 60000    | Maximum time, in milliseconds, to wait when analyzing an inbound automated tone (like a fax machine or answering system). |
+
+### Full Example
+
+```sfdocs-code {"lang":"agentscript", "title": "Full Voice Modality"}
+modality voice:
+    inbound_filler_words_detection: True
+    inbound_keywords:
+        keywords:
+            - "urgent"
+            - "emergency"
+    voice_id: "UgBBYS2sOqTuMpoF3BR0"
+    outbound_speed: 1.0
+    outbound_style_exaggeration: 0.5
+    pronunciation_dict:
+        - grapheme: "Eliquis"
+          phoneme: "ɛlɪkwɪs"
+          type: "IPA"
+    outbound_filler_sentences:
+        - waiting: ["Let me look into that...", "Give me a moment..."]
+    additional_configs:
+        speak_up_config:
+            speak_up_first_wait_time_ms: 10000
+            speak_up_follow_up_wait_time_ms: 10000
+            speak_up_message: "Are you still there?"
+        endpointing_config:
+            max_wait_time_ms: 1000
+        beepboop_config:
+            max_wait_time_ms: 1000
+```
+
+:::note
+The voice modality requires a deterministic locale. If your agent uses a `language` block with `adaptive: True`, adaptive language mode is ignored on voice channels and a warning is emitted. Configure a specific `default_locale` in the language block when pairing it with `modality voice`.
+:::
+
+To branch agent logic based on the customer's current channel at runtime (as opposed to configuring voice-specific behavior here), use the [`@system_variables.current_modality`](reference/ascript-ref-variables-system.md#current_modality) system variable.
+
 ## Connection Block
 
-You can use the connection block to describe how this agent interacts with outside connections. For instance, this code snippet shows how the agent interacts with [Enhanced Chat](https://help.salesforce.com/s/articleView?id=service.miaw_intro_landing.htm).
+Use the connection block to describe how this agent interacts with outside connections. For instance, this code snippet shows how the agent interacts with [Enhanced Chat](https://help.salesforce.com/s/articleView?id=service.miaw_intro_landing.htm).
 
 ```sfdocs-code {"lang":"agentscript", "title": "Connection Block"}
 connection messaging:
@@ -104,7 +246,7 @@ You can use the connection block alongside the [@utils.escalate](reference/ascri
 
 ## Subagent Blocks
 
-Use the subagent block to specify the instructions, logic, and actions for a subagent. A subagent block contains a description, a list of actions, and the reasoning instructions. To define a connection to another Agentforce agent in your Salesforce org, see [Connected_Subagent Blocks (Beta)](#connected_subagent-blocks-beta) .
+Use the subagent block to specify the instructions, logic, and actions for a subagent. A subagent block contains a description, a list of actions, and the reasoning instructions. To define a connection to another Agentforce agent in your Salesforce org, see [Connected Subagent Blocks](#connected-subagent-block).
 
 ```sfdocs-code {"lang":"agentscript", "title": "Subagent Block"}
 subagent Order_Management:
@@ -163,15 +305,11 @@ These properties make up a subagent block:
   - **reasoning.actions**: The list of tools that are applicable for the reasoning engine to use. This list can point to agent actions listed in the higher-level actions section, as well as other functionality available to the reasoning engine (such as transitioning to another subagent, or setting a variable's value). See [Tools (Reasoning Actions)](reference/ascript-ref-tools.md).
 - **actions**: This section defines the agent actions available from this subagent. It contains a description of the action, the list of inputs and outputs, and the target location where this action resides. If you want to allow the reasoning engine to use one of these agent actions, you must also point to this action from the `reasoning.actions` section. See [Actions](reference/ascript-ref-actions.md).
 
-## Connected_Subagent Blocks (Beta)
+## Connected Subagent Block
 
-:::note
-Multi-Agent Orchestration (connected subagents) is a pilot or beta service that is subject to the [Beta Services Terms at Agreements - Salesforce.com](https://www.salesforce.com/company/legal/agreements/) or a written Unified Pilot Agreement if executed by Customer, and applicable terms in the [Product Terms Directory](https://ptd.salesforce.com/). Use of this pilot or beta service is at the Customer's sole discretion.
-:::
+Use the `connected_subagent` block to define a connection to another Agentforce agent in your Salesforce org. Connected subagents differ from [subagents](#subagent-blocks) that are part of your current agent. A connected subagent represents a complete, independent agent with its own distinct expertise and identity. A connected subagent can contain one or more subagents of its own. You can use a connected subagent in a [reasoning action](reference/ascript-ref-actions.md#using-actions) to delegate tasks to another Agentforce agent.
 
-Use the `connected_subagent` block to define a connection to another Agentforce agent in your Salesforce org. A connected subagent is different from a [subagent](#subagent-blocks) that's part of your current agent. You can use a connected subagent in a [reasoning action](reference/ascript-ref-actions.md#using-actions) to delegate tasks to another Agentforce agent.
-
-For more information about using multiple agents in a Salesforce org, see [Multi-Agent Orchestration (Beta)](https://help.salesforce.com/s/articleView?id=ai.agent_multi_orch.htm&type=5).
+For more information about using multiple agents in a Salesforce org, see [Multi-Agent Orchestration](https://help.salesforce.com/s/articleView?id=ai.agent_multi_orch.htm&type=5) and [Agent Script in Multi-Agent Solutions](https://help.salesforce.com/s/articleView?id=ai.agent_multi_orch_script.htm&type=5) in Salesforce Help.
 
 ```sfdocs-code {"lang":"agentscript", "title": "Example - Define the CRM_Agent Connected Subagent"}
 connected_subagent CRM_Agent:
@@ -186,7 +324,16 @@ connected_subagent CRM_Agent:
         currentRecordId: string = @variables.currentRecordId
 ```
 
-```sfdocs-code {"lang":"agentscript", "title": "Example - Use a Connected Subagent as a Reasoning Action"}
+```sfdocs-code {"lang":"agentscript", "title": "Example - Delegate Control to a Connected Subagent (Handoff Mode)"}
+start_agent agent_router:
+    model_config:
+        model: "model://sfdc_ai__DefaultEinsteinHyperClassifier"
+    reasoning:
+        actions:
+            go_to_crm: @utils.transition to @connected_subagent.CRM_Agent
+```
+
+```sfdocs-code {"lang":"agentscript", "title": "Example - Route to the Connected Subagent and Supervise its Output (Supervisor Mode)"}
 start_agent agent_router:
     label: "Agent Router"
     description: "Welcome the user and determine the appropriate subagent based on user input"
@@ -204,16 +351,27 @@ start_agent agent_router:
 These properties make up a `connected_subagent` block:
 
 - **connected_subagent name**: The name used to reference this connected subagent elsewhere in your Agent Script.
-- **target**: The URI identifying the external agent. This value is filled in when you [connect an agent as a subagent in Agentforce Builder](https://help.salesforce.com/s/articleView?id=ai.agent_multi_orch_connect.htm&type=5).
+- **target**: The URI identifying the Agentforce agent (also called the reference agent). This value is filled in when you [connect an agent as a subagent in Agentforce Builder](https://help.salesforce.com/s/articleView?id=ai.agent_multi_orch_connect.htm&type=5).
 - **label** (optional): A human-readable label for the connected subagent.
-- **description** (optional): Describes the connected subagent's capabilities or when it should be called. This description helps the reasoning engine decide when to delegate to the subagent.
+- **description** (required): Describes the connected subagent's capabilities or when it should be called. This description helps the reasoning engine decide when to delegate to the connected subagent.
 - **loading_text** (optional): A message shown to the customer while the connected subagent runs.
 - **inputs** (optional): Values passed to the connected subagent. Each input binding has two sides:
 
-  - The **left side** (for example, `customer_id`) is a linked, or context, variable defined in the _connected_ subagent (that is, in the other Agentforce agent). Names a value that the connected subagent expects to receive.
-  - The **right side** (for example, `@variables.Customer_Id`) binds the connected subagent's input to a variable in the calling agent. Can be any variable type.
+  - The **left side** (for example, `customer_id`) is a custom, or mutable, variable defined in the connected subagent (that is, in the other Agentforce agent).
+  - The **right side** (for example, `@variables.Customer_Id`) binds the connected subagent's input to a variable in the calling agent. These variables can be either context, or linked variables, or custom, or mutable variables.
 
   For example, suppose your input is `customer_id: string = @variables.Customer_Id`. The connected subagent's `customer_id` variable receives the value of the calling agent's `Customer_Id` variable.
+
+:::note
+In this release, variables are passed in one direction only: from the orchestrator agent to the connected subagent. Variables aren’t passed from a connected subagent back to the orchestrator agent.
+:::
+
+- **after_response** (optional): Runs after the connected subagent has responded to the user.
+  - **if/then (conditional)** - branch on outcome.
+  - **set** - set the value of a custom, or mutable, variable for the pipeline.
+  - **transition** - delegate control to the next connected subagent. Any script commands placed after the
+    transition are skipped.
+- **delegate_escalation** (optional): If `True`, allows the connected subagent to escalate to a human representative. Applies only if the connected subagent is in handoff mode. Otherwise, if unspecified, or if the orchestrator agent is in supervision mode, escalation to a human occurs in the orchestrator agent only.
 
 ## Start Agent Block
 
@@ -249,3 +407,4 @@ For more guidance on how to use the start agent block for subagent routing and f
 - [Agent Script Patterns](./patterns/ascript-patterns.md)
 - [Agent Script Reference](reference/ascript-reference.md)
 - [Configure Models in Agent Script](./ascript-model.md)
+- [Configure Voice Models in Agent Script](./ascript-voice.md)

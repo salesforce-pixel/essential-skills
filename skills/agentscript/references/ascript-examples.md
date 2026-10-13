@@ -4,17 +4,17 @@ This section provides example Agent Scripts you can use to get started building 
 
 ## Available Examples
 
-| Example                                                                                        | Description                                                                                                                       |
-| ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| [Customer Support](examples/ascript-examples-customer-support.md)                     | An agent that verifies identity and provides order information                                                                    |
-| [Enforce Subagent Sequencing With Variables](examples/ascript-examples-multi-turn.md) | A step-based interview agent that enforces question order while handling natural conversation                                     |
-| [Ground Your Agent With Updated Terminology](examples/ascript-example-rag-jargon.md)  | Ensure that your grounded agent understands your organization's evolving jargon without having to update your information sources |
+| Example                                                                                                | Description                                                                                                                       |
+| ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| [Customer Support](examples/ascript-examples-customer-support.md)                             | An agent that verifies identity and provides order information                                                                    |
+| [Enforce Subagent Sequencing With Variables](examples/ascript-examples-multi-turn.md)         | A step-based interview agent that enforces question order while handling natural conversation                                     |
+| [ADL Agent Example - Demystify Jargon with Knowledge](examples/ascript-example-rag-jargon.md) | Ensure that your grounded agent understands your organization's evolving jargon without having to update your information sources |
 
 ## Agent Script Recipes
 
 For more Agent Script examples, see [Agent Script Recipes](https://developer.salesforce.com/sample-apps/agent-script-recipes).
 
-[> *[Image removed — see online documentation]*](https://developer.salesforce.com/sample-apps/agent-script-recipes)
+[Agent Script Recipes](https://developer.salesforce.com/sample-apps/agent-script-recipes)
 
 ## Related Topics
 

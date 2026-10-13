@@ -1,9 +1,9 @@
-# Manifest Defining a Single Agent Version
+# Manifest for Different Bot/AiAuthoringBundle Versions (v67 and Earlier)
 
-This example `package.xml` manifest file defines the metadata for version two of the agent NGA_Service_Agent. The file also defines the agent's flows, prompt templates, and Apex classes.
+This example `package.xml` manifest file defines the metadata to retrieve version 9 of the TestAgentFromSource agent, which corresponds to version 7 of GenAiPlannerBundle and BotVersion. The file also defines the agent's flows, prompt templates, and Apex classes.
 
 :::note
-Before deploying a single agent version into an org, you must have deployed the full agent to the org. Deploying the agent before deploying an agent version ensures all required metadata and artifacts are created in the target org.
+Before deploying a single agent version into an org, you must first deploy the full agent. See [Manifest Defining All Agents (v67 and Earlier)](./package-allagents67.md).
 :::
 
 ```xml
@@ -11,15 +11,15 @@ Before deploying a single agent version into an org, you must have deployed the 
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
  <!-- Use BotVersion instead of Bot to get a specific version of an agent -->
     <types>
-        <members>NGA_Service_Agent.v2</members>
+        <members>TestAgentFromSource.v7</members>
         <name>BotVersion</name>
     </types>
     <types>
-        <members>NGA_Service_Agent_v2</members>
+        <members>TestAgentFromSource_v7</members>
         <name>GenAiPlannerBundle</name>
     </types>
     <types>
-        <members>NGA_Service_Agent_2</members>
+        <members>TestAgentFromSource_9</members>
         <name>AiAuthoringBundle</name>
     </types>
 

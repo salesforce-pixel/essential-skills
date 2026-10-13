@@ -33,7 +33,7 @@ This agent provides an example of using step variables. It is not a production-r
 
 The `start_agent` subagent acts as a router. It checks the value of the `currentInterviewStep` variable and transitions to the corresponding subagent. For example, if the value of `currentInterviewStep` is `Permission`, this transition runs:
 
-```
+```sfdocs-code {"lang":"agentscript", "title": "Transition to Permission Topic"}
 start_agent agent_router:
     label: "Agent Router"
     description: "Welcome the user and determine the appropriate subagent based on user input"

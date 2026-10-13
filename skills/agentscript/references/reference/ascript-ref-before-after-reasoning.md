@@ -2,6 +2,10 @@
 
 Agentforce runs a subagent's `after_reasoning` block after the reasoning loop exits, on every request. The `after_reasoning` block can contain logic, actions, transitions, or other directives, but can't contain the `|` (pipe) command. Typical use cases are to set customer-entered information into a variable, transition to a different subagent, or run an action.
 
+:::note
+You can't use `before_reasoning` or `after_reasoning` in a subagent that uses the EinsteinHyperClassifier model.
+:::
+
 For example, this `after_reasoning` block sets the appointment duration based on the urgency level.
 
 ```sfdocs-code {"lang":"agentscript", "title": "After Reasoning Instructions"}

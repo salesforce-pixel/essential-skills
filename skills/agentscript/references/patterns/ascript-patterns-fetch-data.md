@@ -66,3 +66,4 @@ reasoning:
 - Reference: [Reasoning Instructions](../reference/ascript-ref-instructions.md)
 - Reference: [Actions](../reference/ascript-ref-actions.md)
 - Reference: [Variables](../reference/ascript-ref-variables.md)
+- _Trailhead_: [Programmatic Instructions in Agentforce: Give Your Agent More Information with Flows, Actions, and Permissions](https://trailhead.salesforce.com/content/learn/modules/programmatic-instructions-in-agentforce)

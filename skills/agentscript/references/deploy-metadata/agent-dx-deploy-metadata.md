@@ -1,14 +1,24 @@
 # Use Metadata to Move an Agent to a New Org
 
-After you've created an agent in an org, either by using the [Agentforce UI](https://help.salesforce.com/s/articleView?id=ai.copilot_intro.htm&type=5) or [Agentforce DX](../agent-dx.md), you can move the agent to another org by retrieving and deploying its metadata. For example, to move an agent from a sandbox org to a production org, first retrieve the agent's metadata from the sandbox org to your local machine. Then, deploy the agent's metadata to the production org.
+After you've created an agent in an org, you can move the agent to another org by retrieving and deploying its metadata. For example, to move an agent from a sandbox org to a production org, first retrieve the agent's metadata from the sandbox org to your local machine. Then, deploy the agent's metadata to the production org.
+
+:::important
+Agent metadata is updated in API v68. To use these metadata types to move agents between orgs, _both_ orgs must be in API v68. While your sandbox org is in Winter ʼ27 and your production org is in Summer ʼ26, continue to use the previous metadata types. See [Define Agent Metadata (v67 and Earlier)](./agent-dx-api-v67-earlier.md).
+:::
 
 This document uses [Salesforce CLI commands](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_top.htm) to retrieve and deploy the agent's metadata. To use VS Code, see [Salesforce Extensions for VS Code](https://developer.salesforce.com/docs/platform/sfvscode-extensions/guide/deploy-changes.html).
 
+:::tip
+You can download this metadata deployment documentation to help your coding agents or deployment tools deploy Agentforce agents. See [Download Agent Script Documentation](../ascript-download-documentation.md).
+:::
+
 ## Step 1: Set Up Your Local Development Environment
 
-1. Install [Salesforce CLI](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_install_cli.htm).
+1. Install [Salesforce CLI](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_install_cli.htm) or run `sf update` to install the latest version.
 
-   To test your setup, run `sf search` and see the list of CLI commands.
+:::important
+You need the latest version of Salesforce CLI to retrieve and deploy the latest version of Salesforce metadata.
+:::
 
 2. [Authorize](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth.htm) your source and target orgs by using Salesforce CLI:
 
@@ -33,84 +43,63 @@ sf template generate project --name <name> --template standard --manifest
 
 A Salesforce DX project is created on your local machine in the `<project name>` directory; the project contains an example `package.xml` manifest file.
 
-## Step 3: Define Metadata in the Manifest File
+## Step 3: Define Metadata in the Manifest File (v68 and Later)
 
-Create a manifest to define the metadata you want to retrieve. You can copy and edit the default manifest that was created in your project at `manifest/package.xml`.
+:::important
+Agent metadata is updated in API v68. To define an agent using API v67 and earlier, see [Define Agent Metadata (v67 and Earlier)](./agent-dx-api-v67-earlier.md).
+:::
 
-### Understand Agent and Legacy Agent Metadata
+Create a manifest to define the metadata you want to retrieve. You can copy and edit the default manifest that was created in your project at `manifest/package.xml`:
 
-- Draft (uncommitted) agents and agent versions are represented by `AiAuthoringBundle`. A draft agent is editable until it's committed.
-- Committed agents and agent versions are represented by `AiAuthoringBundle`, plus `Bot` and `BotVersion`. You can't change a committed agent. Instead, create a new version.
-- Legacy agents don't have a commit stage, and are represented by `Bot` and `BotVersion` (not `AiAuthoringBundle`). You can edit and overwrite an active legacy agent.
+- Use `#<number>` to specify a specific agent version version
+- Use `#*` to specify all agent versions
 
-| Agent Type      | Metadata Representation                      |
-| :-------------- | :------------------------------------------- |
-| Draft Agent     | `AiAuthoringBundle`                          |
-| Committed Agent | `AiAuthoringBundle` + `Bot` and `BotVersion` |
-| Legacy Agent    | `Bot` and `BotVersion`                       |
+| Version to Specify         | Example     |
+| -------------------------- | ----------- |
+| Version 2 of MyAgent       | `MyAgent#2` |
+| All versions of MyAgent    | `MyAgent#*` |
+| All versions of ALL agents | `*`         |
 
-For more details, see [Agent Metadata: A Shallow Dive](../agent-dx-metadata.md) and [Agentforce Metadata Types](/docs/ai/agentforce/references/agents-metadata-tooling/agents-metadata.html).
+The system automatically retrieves your agent's flow, Apex, and prompt template actions, so you **don't** need to define your agent's actions. Add any other metadata types that your agent needs, such as Data 360 dependencies or custom objects.
 
-### Example Package.xml Manifest Files
+:::important
+The first time you deploy an agent in your target org, you must include the whole agent definition and not just a specific version.
+:::
 
-Use these examples to get started:
+### Example: Specify all Versions of MyServiceAgent
 
-- Replace the version number (for example, `<version>65.0</version>`) with your required metadata version. Your project's sample `package.xml` manifest contains the most recent version number.
-- Add any other metadata types that your agent needs, such as Data 360 dependencies.
-
-| Example Manifest                                                                                   | Description                                                                                                                               | Notes                                                                                                                                                                                                                                                               |
-| -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [All Agents](./package-allagents.md)                                                               | Defines metadata for all agents, including legacy agents. Includes metadata for all flows, prompt templates, and Apex classes in the org. | Replace the `*` wildcard with the API names of the ApexClass, Flows, and GenAiPromptTemplates that your agents use. Using wildcards for these types can pull excessive data, leading to very long deployments or timeouts.                                          |
-| [Single Agent Version](./package-singleagent.md)                                                   | Defines a single version of an agent, plus the flows, prompt templates, and Apex class types that the agent version uses.                 | Before deploying a single agent version into an org (using `BotVersion`), you must have deployed the full agent to the org. Deploying the agent before deploying a specific version ensures that all required metadata and artifacts are created in the target org. |
-| [Single Agent Version with Different Bot/AiAuthoringBundle Versions](./package-single-mismatch.md) | Defines a single agent version when the `AiAuthoringBundle` version doesn't match the `Bot`/`BotVersion` version.                         | This difference can happen when you save more versions than you commit. See [Step 4 - Update Your Manifest for Different Bot/AiAuthoringBundle Versions](#step-4-optional---update-your-manifest-for-different-botaiauthoringbundle-versions).                      |
-
-#### Update Your Manifest
-
-To define a single agent version, make these changes to your manifest.
-
-1. Instead of `Bot`, which is the top-level representation of an agent, use `BotVersion`, which represents the configuration for a specific agent version. Include the agent version's name and version number. For example:
-
-```sfdocs-code {"lang":"xml", "title": "Specify a BotVersion in the Manifest"}
-<types>
-   <members>NGA_Service_Agent.v2</members>
-   <name>BotVersion</name>
-</types>
+```xml
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>MyServiceAgent</members>
+        <name>AiAgentDefinition</name>
+    </types>
+    <types>
+        <members>MyServiceAgent#*</members>
+        <name>AiAgentDefinitionVersion</name>
+    </types>
+    <version>68.0</version>
+</Package>
 ```
 
-2. Instead of using the agent's name to specify `AiAuthoringBundle` and `GenAiPlannerBundle`, use the agent's versioned name. For example:
+### Example: Specify Version 2 and 3 of MyServiceAgent
 
-```sfdocs-code {"lang":"xml", "title": "Reference an Agent Version by Its Versioned Name"}
-<types>
-   <members>NGA_Service_Agent_2</members>
-   <name>AiAuthoringBundle</name>
-<types>
-   <members>AgentforceServiceAgent_v2</members>
-   <name>GenAiPlannerBundle</name>
-</types>
-</types>
+```xml
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>MyServiceAgent</members>
+        <name>AiAgentDefinition</name>
+    </types>
+    <types>
+        <members>MyServiceAgent#2</members>
+        <members>MyServiceAgent#3</members>
+        <name>AiAgentDefinitionVersion</name>
+    </types>
+    <version>68.0</version>
+</Package>
 ```
 
-## Step 4: (Optional) - Update Your Manifest for Different Bot/AiAuthoringBundle Versions
-
-Use these steps to specify the correct versions for your agent's metadata.
-
-### What are mismatched `Bot`/`AiAuthoringBundle` versions?
-
-When you save an agent version, Agentforce creates `AiAuthoringBundle` metadata. When you commit an agent version, Agentforce creates Bot/BotVersion metadata. If you save more versions than you commit, the version of your `AiAuthoringBundle` won't match the version of your Bot/BotVersion.
-
-For example, this agent has 11 versions of an agent and 7 committed versions. Therefore, the agent's metadata contains 11 versions of `AiAuthoringBundle` and 7 versions of `Bot` and `BotVersion`. You'll need to specify the correct version numbers to match the correct `AiAuthoringBundle` to the correct `Bot` and `BotVersion`.
-
-> *[Image removed — see online documentation]*
-
-To find the matching `Bot` version, open the AiAuthoringBundle folder for your desired version. In the agent version's `bundle-meta.xml` file, the `target` metadata shows the version to use for the `GenAiPlannerBundle` and `BotVersion`.
-
-For example, version 9 of the agent "TestAgentFromSource" uses version 7 of `GenAiPlannerBundle` and `BotVersion`.
-
-> *[Image removed — see online documentation]*
-
-Use these versions to specify your manifest, for example [Manifest for Different Bot/AiAuthoringBundle Versions](./package-single-mismatch.md)
-
-## Step 5: Retrieve Agent Metadata
+## Step 4: Retrieve Agent Metadata
 
 After defining the metadata in your project's manifest (for example, `package.xml`), retrieve the agent's metadata to your local machine. Use the org's alias that you configured when [authorizing your org](#step-1-set-up-your-local-development-environment).
 
@@ -118,25 +107,21 @@ After defining the metadata in your project's manifest (for example, `package.xm
 sf project retrieve start --manifest manifest/package.xml --target-org <org alias>
 ```
 
-For more information about retrieving and deploying metadata, see [Basic Retrieval and Deployment of Metadata: A Refresher](../agent-dx-synch.md#basic-retrieval-and-deployment-of-metadata-a-refresher).
+## Step 5: (Optional) Update Your Draft Agent's Username
 
-## Step 6: (Optional) Update Agent Username
+Your retrieved metadata contains the agent username(s) from the source org. To enable your draft agent to run out-of-the-box on the target org, you can use [string replacement](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_string_replace.htm) to update the username with a target org's username. Agents run in the context of a user, and the usernames on your source and target orgs are different. You can't use string replacement to update a committed agent's username, because committed agents can't be edited.
 
-Your retrieved metadata contains the agent username(s) from the source org. To enable your agent to run out-of-the-box on the target org, use [string replacement](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_string_replace.htm) to update the username with the target org's username. Agents run in the context of a user, and the usernames on your source and target orgs are different.
-
-:::note
-If you deploy an agent to your target org without replacing the username, you'll need to [manually update the agent's username](#set-the-agent-user-and-assign-permissions) before it can run on the target org.
+:::important
+Don't modify any other agent metadata that you retrieved. Uploading edited metadata to an org can corrupt your org.
 :::
+
+If you deploy a draft agent to your target org without replacing the username, you'll need to [manually update the agent's username](#set-the-agent-user-and-assign-permissions) before it can run on the target org.
 
 See [Example - Configure String Replacement for Agent Username](string-replace-example.md).
 
-## Step 7: Deploy Agent Metadata to a New Org
+## Step 6: Deploy Agent Metadata to a New Org
 
 Once you've retrieved your agent's metadata to your local project, you can deploy the metadata to a new org.
-
-:::important
-Don't modify the metadata that you retrieved. Uploading edited metadata to an org can corrupt your org. )
-:::
 
 Use the right [deploy](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_project_commands_unified.htm#cli_reference_project_deploy_start_unified) command for your project.
 
@@ -150,6 +135,8 @@ Before using your agent in the new org, you must assign the agent user. If you d
 
 :::tip
 You can't edit a **committed** agent. To add an agent user to a committed agent, first create a new agent version. Then, add the user to the new version.
+
+After you've deployed an agent on your target org, the agents in both your source and target orgs must match or future deployments will be blocked. If you create a new version in your target org, create a corresponding version in your source org. 
 :::
 
 Ensure the agent user has sufficient permissions to carry out the agent's tasks. For example, if the agent reads a custom contact field, the agent user must have view permission on the custom field.

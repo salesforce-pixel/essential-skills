@@ -1,4 +1,4 @@
-# Agent Script Example: Ground Your Agent With Updated Terminology
+# ADL Agent Example - Demystify Jargon with Knowledge
 
 Ensure that your [grounded](https://help.salesforce.com/s/articleView?id=ai.agent_parent_data.htm&type=5) agent understands your organization's evolving jargon, domain-specific terms, or updated product names — without having to update and reindex your information sources.
 
@@ -31,7 +31,9 @@ This solution is **not** a good fit when:
 
 To follow along with this example, you can sign up for a free Salesforce Developer Edition org, then configure the org with Data Cloud and Agentforce.
 
-> **Note:** Instead of signing up for a new org, you can re-use an existing developer org.
+:::note
+Instead of signing up for a new org, you can re-use an existing developer org.
+:::
 
 For a complete Agentforce implementation guide, see [Create Agents in Record Time with Agentforce Implementation Guides](https://help.salesforce.com/s/articleView?id=ai.agent_resources.htm&type=5).
 
@@ -125,7 +127,9 @@ Your agent is now grounded on Aura & Ash product instructions and can answer cus
 3. The agent responds with information grounded in your library, such as massaging a few drops into your nails and allowing time for absorption.
 4. Now, repeat the question with the product's new name by entering `How do I use Iron Grip Rescue Fuel?`. The agent doesn't have your product's new name and responds that it can't help. We'll download the product's old and new name map in the next step, so that the agent can find the relevant information.
 
-> **Note:** By testing the agent with new terms before you map them, you're ensuring that your agent doesn't already know your new terms. Sometimes, jargon or domain-specific knowledge is still part of the public knowledge set on which the LLM was trained. In that case, the LLM might correctly link a customer's jargon term to your data library's knowledge without using your terminology map. It's important to verify a failure case first, so you can validate your solution later.
+:::note
+By testing the agent with new terms before you map them, you're ensuring that your agent doesn't already know your new terms. Sometimes, jargon or domain-specific knowledge is still part of the public knowledge set on which the LLM was trained. In that case, the LLM might correctly link a customer's jargon term to your data library's knowledge without using your terminology map. It's important to verify a failure case first, so you can validate your solution later.
+:::
 
 ## Create a Terminology Map with Salesforce Knowledge
 
@@ -135,7 +139,9 @@ Your agent is grounded on Aura & Ash's product usage information, but your data 
 
 To create a Knowledge article, set up Salesforce Knowledge, grant yourself and your agent user permissions on the `knowledge__kav` object, create a template, and grant the agent user access to Knowledge.
 
-> **Note:** This example walks you through a basic Knowledge setup that meets the needs of this example. If your organization already uses Knowledge, you can use an existing article type.
+:::note
+This example walks you through a basic Knowledge setup that meets the needs of this example. If your organization already uses Knowledge, you can use an existing article type.
+:::
 
 ### Assign Yourself the Knowledge User License
 
@@ -155,7 +161,9 @@ Assign your user the Knowledge user license so you can create Knowledge articles
 
 You need a Knowledge article layout with a text field to hold your map of old and new product names.
 
-> **Note:** This example adds a custom field to the Knowledge layout. If your organization already has layouts defined, consider reusing an existing layout.
+:::note
+This example adds a custom field to the Knowledge layout. If your organization already has layouts defined, consider reusing an existing layout.
+:::
 
 1. In Setup, select **Object Manager**.
 2. In Quick Find, enter and select **Knowledge** (API name `Knowledge__kav`).
@@ -188,7 +196,9 @@ Your agent user needs read permissions on the Knowledge object,`Knowledge__kav`,
 7. Click **Save**.
 
 > *[Image removed — see online documentation]*
-> **Note:** Always give your agent user the fewest permissions it needs to do its job. In this example, our EinsteinServiceAgent user doesn't need write access. For more information about service agent permissions, see [(Help:) Best Practices for Agent User Permissions](https://help.salesforce.com/s/articleView?id=ai.agent_user.htm&type=5).
+:::note
+Always give your agent user the fewest permissions it needs to do its job. In this example, our EinsteinServiceAgent user doesn't need write access. For more information about service agent permissions, see [(Help:) Best Practices for Agent User Permissions](https://help.salesforce.com/s/articleView?id=ai.agent_user.htm&type=5).
+:::
 
 ### Give Your Agent User Access to Knowledge
 
@@ -324,7 +334,7 @@ Run your GetNewProductNames action in the reasoning instructions, then store the
 1. Switch to Script mode.
 2. In the GeneralFaq subagent, below `instructions: ->` and above `| Your job is solely to help with issues`, paste these instructions.
 
-```
+```sfdocs-code {"lang":"agentscript", "title": "Action Script (REPLACE ARTICLE NUMBER WITH YOURS)"}
 if @variables.Old2NewProductNames == "NotRun":
       run @actions.GetNewProductNames
          with articleNumber = "000001000"
@@ -374,9 +384,9 @@ You can see that your Get Alternate Product Names action is run only once.
 
 This example's Agent Script uses these [patterns and best practices](../patterns/ascript-patterns.md).
 
-| Pattern                                                                   | Usage in Script                                                                                                                                                                                                                                                                                                                                                |
-| ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pattern                                                                                | Usage in Script                                                                                                                                                                                                                                                                                                                                                |
+| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Fetch Data Before Reasoning](../patterns/ascript-patterns-fetch-data.md) | The flow runs **before** the prompt is sent to the LLM, so the agent always has our updated product names.                                                                                                                                                                                                                                                     |
 | [Using Conditionals](../patterns/ascript-patterns-conditionals.md)        | The `if @variables.Old2NewProductNames == "NotRun"` check ensures the action is run only once, reducing processing and potentially cost.                                                                                                                                                                                                                       |
 | [Using Variables Effectively](../patterns/ascript-patterns-variables.md)  | `Old2NewProductNames` has a default value, so we can check when it's not been used.                                                                                                                                                                                                                                                                            |
-| Verify the agent with a known failure case                                | LLMs can infer a surprising amount of information and have been trained on a vast array of public knowledge. Before injecting the prompt with our product name map, we verified the agent didn't understand the new product names. That way, we're confident that the updated name information is coming from our map, not from inference or public knowledge. |
+| Verify the agent with a known failure case                                             | LLMs can infer a surprising amount of information and have been trained on a vast array of public knowledge. Before injecting the prompt with our product name map, we verified the agent didn't understand the new product names. That way, we're confident that the updated name information is coming from our map, not from inference or public knowledge. |

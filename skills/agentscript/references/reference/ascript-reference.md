@@ -35,7 +35,8 @@ This table lists some of the key terms used in an Agent Script file.
 | `language`                            | Top-level block for supported languages.                                                                               | [Language Block](../ascript-blocks.md#language-block)                    |
 | `linked`                              | Declare a variable whose value comes from an external source. For example: `session_id: linked string`                 | [Variables](ascript-ref-variables.md#linked-variables)                   |
 | `messages`                            | System messages like welcome and error prompts.                                                                        | [System Block](../ascript-blocks.md#system-block)                        |
-| `mutable`                             | Allow a variable's value to be changed. For example: `order_id: mutable string = ""`                                   | [Variables](ascript-ref-variables.md#regular-variables)                  |
+| `modality voice`                      | Top-level block that defines how an Agentforce Voice agent speaks, including the voice persona and voice model.        | [Configure Voice Models](../ascript-voice.md)                            |
+| `mutable`                             | Allow a variable's value to be changed. For example: `order_id: mutable string = ""`                                   | [Variables](ascript-ref-variables.md#custom-variables)                   |
 | `reasoning`                           | Block containing instructions and tools for the LLM.                                                                   | [Reasoning Instructions](ascript-ref-instructions.md)                    |
 | `reasoning.actions`                   | Tools the LLM can choose to call within a subagent.                                                                    | [Tools (Reasoning Actions)](ascript-ref-tools.md)                        |
 | `reasoning.instructions`              | Prompt and logic instructions sent to the reasoning engine.                                                            | [Reasoning Instructions](ascript-ref-instructions.md)                    |
@@ -62,6 +63,8 @@ These reference topics cover key concepts and terms associated with Agent Script
 - **[Blocks](../ascript-blocks.md)** - The structural components of an Agent Script, where each block contains a set of properties that describe data or procedures.
 
 - **[Conditional Expressions](ascript-ref-expressions.md)** - Deterministically specify what actions to take or which prompts to include based on the current context.
+
+- **[Configure Voice Models](../ascript-voice.md)** - Select and configure the text-to-speech voice model for an Agentforce Voice agent using the `modality voice` block.
 
 - **[Reasoning Instructions](ascript-ref-instructions.md)** - Instructions that Agentforce resolves into a prompt for the LLM.
 

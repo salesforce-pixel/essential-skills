@@ -1,19 +1,19 @@
-# Configure Models in Agent Script
+# Specify Different Models in Agent Script
 
-By default, Agentforce uses the model [selected in Setup](https://help.salesforce.com/s/articleView?id=ai.agent_setup_select_model_provider.htm&type=5) for all agents in your org. Override your org's default model for a specific agent and for subagents within an agent.
-
-To specify a model, use `model_config`. For example:
+By default, Agentforce uses the [org-level model selected in Setup](https://help.salesforce.com/s/articleView?id=ai.agent_setup_select_model_provider.htm&type=5) for all agents and subagents. To use a different model for a specific agent or subagent, override the default with `model_config`.
 
 ```sfdocs-code {"lang":"agentscript", "title": "Specify a Model in an Agent or Subagent"}
 model_config:
-    model: "model://sfdc_ai__DefaultBedrockAnthropicClaude45Sonnet"
+    model: "model://sfdc_ai__DefaultBedrockAnthropicClaude45Haiku"
 ```
 
 Specify any [supported model](../../models/supported-models.md). To test your model selections, use different models in different versions of your agent.
 
 :::important
-Thoroughly test your agent with your chosen model or models before deploying. Some supported models may not be suitable for your agent or agent's tools.
-:::
+
+- We recommend that you use GPT 4.1 (`sfdc_ai__DefaultGPT41`), Claude Haiku 4.5 (`sfdc_ai__DefaultBedrockAnthropicClaude45Haiku`), or Gemini 3.5 Flash (`sfdc_ai__DefaultVertexAIGemini35Flash`) because these models have been thoroughly tested with agents.
+- Thoroughly test your agent with your chosen model or models before deploying. Some supported models may not be suitable for your agent or agent's tools.
+  :::
 
 ## Example: Configure a Specific Model for the Agent
 
@@ -26,7 +26,7 @@ system:
         welcome: Hi, I'm an AI service assistant. How can I help you?
         error: "Sorry, it looks like something has gone wrong."
 model_config:
-    model: "model://sfdc_ai__DefaultBedrockAnthropicClaude45Sonnet"
+    model: "model://sfdc_ai__DefaultBedrockAnthropicClaude45Haiku"
 ```
 
 ## Example: Configure a Specific Model for the Subagent and Agent Router
@@ -37,7 +37,7 @@ Use `model_config` in a subagent to override the org-level or agent-level model 
 subagent ReservationManagement:
     description: "Handles requests to create new reservations for customers at their desired time slots."
     model_config:
-        model: "model://sfdc_ai__DefaultBedrockAnthropicClaude45Sonnet"
+        model: "model://sfdc_ai__DefaultBedrockAnthropicClaude45Haiku"
 ```
 
 Some agent templates, such as Agentforce Service agent, use the Salesforce-owned [EinsteinHyperClassifier](#einsteinhyperclassifier-model) model for subagent classification in the agent router. Keep that model or specify a different model in your agent router.

@@ -1,12 +1,22 @@
-# Agent Script Reference: Variables
+# Agent Script Reference: Variables (Custom and Linked)
 
 Variables let agents deterministically remember information across conversation turns, track progress, and maintain context throughout the session. You define all variables in the `variables` block, and all subagents in the agent can access the variables.
 
-There are several types of variables:
+This page covers custom and linked variables. For predefined runtime variables, see [Agent Script Reference: System Variables](./ascript-ref-variables-system.md).
 
-- **[regular variable](#regular-variables):** You can initialize a variable with a default value, and the agent can change the variable's value.
+- **[custom variable](#custom-variables):** You can initialize a variable with a default value, and the agent can change the variable's value.
 - **[linked variable](#linked-variables):** The value of a linked variable is tied to an output such as an action's output. Linked variables can't have a default value.
-- **[system variable](#system-variables):** Predefined, prepopulated system variables that you can use in your agent.
+
+## Defining a Variable
+
+Define variables in the [`Variables`](../ascript-blocks.md#variables-block) block.
+
+```sfdocs-code {"lang":"agentscript", "title": "Reference a Variable From Script"}
+    CurrentState: mutable string = "gatheringInfo"
+        description: "The current state, or step, of the interview."
+        label: "State"
+        visibility: "External"
+```
 
 ## Variable Names
 
@@ -36,15 +46,16 @@ reasoning:
         | Always use {!@variables.Customer_Email} for the customer's email address.
 ```
 
-## Regular Variables
+## Custom Variables
 
-Regular variables have these properties:
+Custom variables have these properties:
 
 - `mutable` - Optional. Allows the agent to change the variable's value. To ensure a variable's value is never changed, define the variable without `mutable`.
-- `description` - describes the variable. Optional. If you want the LLM to use reasoning to set the variable's value, include a description. See [Let the LLM set variables with user-entered information (slot filling)](../patterns/ascript-patterns-variables.md#let-the-llm-set-variables-with-user-entered-information-slot-filling).
+- `description` - describes the variable. Optional. If you want the LLM to use reasoning to set the variable's value, include a description to help the LLM set the value correctly. See [Let the LLM set variables with user-entered information (slot filling)](../patterns/ascript-patterns-variables.md#let-the-llm-set-variables-with-user-entered-information-slot-filling).
 - `label` - Optional. The variable's name as displayed in the UI. By default, the description is generated from the name. For example, if your variable's name is `my_var`, the UI displays the label `My Var`.
+- `visibility` - Optional. Default value is `Internal`. Set visibility to `External` to allow an API to set the variable's value, or to change the variable's value when [testing the agent in simulate mode](https://help.salesforce.com/s/articleView?id=ai.agent_test_in_builder.htm&language=en_US&type=5).
 
-```sfdocs-code {"lang":"agentscript", "title": "Example: Define Regular Variables"}
+```sfdocs-code {"lang":"agentscript", "title": "Example: Define Custom Variables"}
 variables:
     isPremiumUser: mutable boolean = False
         description: "Indicates whether the user is a premium user."
@@ -55,16 +66,16 @@ variables:
             Stores the customer's membership tier level.
 ```
 
-Regular variables can have these types:
+Custom variables can have these types:
 
-| Type          | Notes                                                                                                              | Example                                                                                                                                |
-| :------------ | :----------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
-| `string`      | Any alphanumeric string without special characters.                                                                | `name: mutable string = ""`                                                                                                            |
-| `number`      | Use for both integers and decimals. For example, 42 or 3.14. Compiles to IEEE 754 double-precision floating point. | `age: mutable number`, `price: mutable number = 99.99`                                                                                 |
-| `boolean`     | Allowed values are `True` or `False`. The value is case-sensitive, so capitalize the first letter.                 | `is_active: mutable boolean = True`                                                                                                    |
-| `object`      | Value is a complex JSON object in the form `{"key": "value"}.`                                                     | `order_line: mutable object = {"SKU": "abc12344409","count": 42}`                                                                      |
-| `date`        | Any valid date format.                                                                                             | `start_date: mutable date`                                                                                                             |
-| `id`          | A Salesforce record ID.                                                                                            | `LeadID_Temp: mutable id = "00Q9V00000ZV2xUUAT"`                                                                                       |
+| Type         | Notes                                                                                                              | Example                                                                                                                                |
+| :----------- | :----------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
+| `string`     | Any alphanumeric string without special characters.                                                                | `name: mutable string = ""`                                                                                                            |
+| `number`     | Use for both integers and decimals. For example, 42 or 3.14. Compiles to IEEE 754 double-precision floating point. | `age: mutable number`, `price: mutable number = 99.99`                                                                                 |
+| `boolean`    | Allowed values are `True` or `False`. The value is case-sensitive, so capitalize the first letter.                 | `is_active: mutable boolean = True`                                                                                                    |
+| `object`     | Value is a complex JSON object in the form `{"key": "value"}.`                                                     | `order_line: mutable object = {"SKU": "abc12344409","count": 42}`                                                                      |
+| `date`       | Any valid date format.                                                                                             | `start_date: mutable date`                                                                                                             |
+| `id`         | Deprecated. Use `string` to store a Salesforce record ID.                                                          | See string type.                                                                                                                       |
 | `list[type]` | A list of values of the specified type. All primitive types and `object` type are supported.                       | `flags: mutable list[boolean] = [True, False, True]`, `scores: list[number] = [95, 87.5, 92]`, `obj_list: mutable list[object] = None` |
 
 ## No Value (None) and Empty String ("")
@@ -108,44 +119,17 @@ Linked variables can have these types:
 - `number`
 - `boolean`
 - `date`
-- `id`
-
-## System Variables
-
-Agent Script provides predefined, prepopulated system variables that you can use in your agent. To access system variables, use `@system_variables.<variable_name>`. A system variable is:
-
-- read-only, so you can't change its value
-- predefined, so you don't define it in the `variables` block
-- used in the same places as a regular variable or a linked variable
-
-Currently, `@system_variables.user_input` is the only system variable.
-
-### `@system_variables.user_input`
-
-The `user_input` system variable contains the customer's most recent utterance (**not** the entire conversation history).
-
-:::note
-The LLM remembers the entire conversation history, so you don't typically need to use `@system_variables.user_input` unless you're passing the last thing a customer said into an action.
-:::
-
-#### Example - Analyze Customer Sentiment
-
-In this example, we pass the last customer utterance into a sentiment analysis action. Although the agent's LLM can also analyze sentiment, we want to use a prompt template action that understands industry-specific terminology and our customer's rapidly-changing language patterns.
-
-```sfdocs-code {"lang":"agentscript", "title": "Example: Analyze sentiment of most recent customer utterance"}
-reasoning:
-    actions:
-        AnalyzeSentiment: @actions.AnalyzeSentiment
-            with utterance = @system_variables.user_input
-            set @variables.customer_sentiment = @outputs.sentiment_classification
-```
+- `id` (deprecated; use `string` for Salesforce record IDs)
 
 ## Examples and Patterns
 
-For examples and patterns using variables, see [Agent Script Pattern: Using Variables Effectively](../patterns/ascript-patterns-variables.md).
+For examples and patterns using variables, see [Agent Script Pattern: Using Variables Effectively](../patterns/ascript-patterns-variables.md) and [Agent Script Pattern: Using List Variables](../patterns/ascript-patterns-var-list.md)
 
 ## Related Topics
 
 - Pattern: [Using Variables Effectively](../patterns/ascript-patterns-variables.md)
+- Pattern: [Using List Variables](../patterns/ascript-patterns-var-list.md)
+- Reference: [System Variables](./ascript-ref-variables-system.md)
+- Reference: [List Variables](./ascript-ref-variables-list.md)
 - [Flow of Control](../ascript-flow.md)
 - Reference: [Utils](ascript-ref-utils.md)

@@ -73,3 +73,4 @@ Keep in mind that the LLM can call any **available** reasoning action, even if y
 - Reference: [Tools (Reasoning Actions)](../reference/ascript-ref-tools.md)
 - Reference: [Conditional Expressions](../reference/ascript-ref-expressions.md)
 - Reference: [Start Agent Block](../ascript-blocks.md#start-agent-block)
+- _Trailhead_: [Programmatic Instructions in Agentforce: Enforce Business Rules with Variables and Action Filters](https://trailhead.salesforce.com/content/learn/modules/programmatic-instructions-in-agentforce)

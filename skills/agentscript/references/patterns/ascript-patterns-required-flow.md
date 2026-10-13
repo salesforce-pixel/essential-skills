@@ -95,3 +95,4 @@ See [Agent Script Example: Use Step Variables to Enforce Subagent Workflows](../
 - Pattern: [Conditionals](ascript-patterns-conditionals.md)
 - Pattern: [Transitions](ascript-patterns-transitions.md)
 - Pattern: [Filtering with Available When](ascript-patterns-filtering.md)
+- _Trailhead_: [Agent Script Basics: Route and Gate Conversations with Agent Script](https://trailhead.salesforce.com/content/learn/modules/agent-script-basics)

@@ -98,3 +98,4 @@ reasoning:
 - Reference: [Conditional Expressions](../reference/ascript-ref-expressions.md)
 - Reference: [Supported Operators](../reference/ascript-ref-operators.md)
 - Reference: [Reasoning Instructions](../reference/ascript-ref-instructions.md)
+- _Trailhead_: [Programmatic Instructions in Agentforce: Use Conditional Logic to Send the Right Prompt for Each Context](https://trailhead.salesforce.com/content/learn/modules/programmatic-instructions-in-agentforce)

@@ -10,20 +10,20 @@ These patterns are written in Agent Script as it appears in Script view, so you 
 
 ## Available Patterns
 
-| Pattern                                                                                              | Description                                                                                                                                                 |
-| ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Action Chaining & Sequencing](ascript-patterns-action-chaining.md)                                  | Run multiple actions in a guaranteed sequence                                                                                                               |
-| [Agent Router](ascript-patterns-topic-selector.md)                                                   | Set up effective subagent routing in the start_agent block                                                                                                  |
-| [Conditionals](ascript-patterns-conditionals.md)                                                     | Use if/else logic to control instructions, actions, and transitions                                                                                         |
-| [Context Engineering](https://help.salesforce.com/s/articleView?id=ai.agent_context_engineering.htm) | Apply context engineering strategies with your Agentforce agents                                                                                            |
-| [Fetch Data](ascript-patterns-fetch-data.md)                                                         | Run actions to retrieve data before the LLM begins reasoning                                                                                                |
-| [Filtering with Available When](ascript-patterns-filtering.md)                                       | Control when subagents and actions are visible to the reasoning engine                                                                                      |
-| [Required Subagent Workflow](ascript-patterns-required-flow.md)                                      | Guarantee users pass through required steps before proceeding                                                                                               |
-| [Resource References](ascript-patterns-resource-references.md)                                       | Reference variables and actions directly in reasoning instructions                                                                                          |
-| [System Overrides](ascript-patterns-system-overrides.md)                                             | Override global system instructions to change behavior per subagent                                                                                         |
-| [Transitions](ascript-patterns-transitions.md)                                                       | Move execution between subagents with `@utils.transition to`                                                                                                |
-| [Variables](ascript-patterns-variables.md)                                                           | Store and use state effectively across subagents                                                                                                            |
-| [Variables (List)](ascript-patterns-var-list.md)                                                     | Store variables in a list, also called a collection. Use a variable from your list just like a regular variable. Use an index to iterate through your list. |
+| Pattern                                                                                              | Description                                                                                                                                                |
+| ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Action Chaining & Sequencing](ascript-patterns-action-chaining.md)                                  | Run multiple actions in a guaranteed sequence                                                                                                              |
+| [Agent Router](ascript-patterns-topic-selector.md)                                                   | Set up effective subagent routing in the start_agent block                                                                                                 |
+| [Conditionals](ascript-patterns-conditionals.md)                                                     | Use if/else logic to control instructions, actions, and transitions                                                                                        |
+| [Context Engineering](https://help.salesforce.com/s/articleView?id=ai.agent_context_engineering.htm) | Apply context engineering strategies with your Agentforce agents                                                                                           |
+| [Fetch Data](ascript-patterns-fetch-data.md)                                                         | Run actions to retrieve data before the LLM begins reasoning                                                                                               |
+| [Filtering with Available When](ascript-patterns-filtering.md)                                       | Control when subagents and actions are visible to the reasoning engine                                                                                     |
+| [Required Subagent Workflow](ascript-patterns-required-flow.md)                                      | Guarantee users pass through required steps before proceeding                                                                                              |
+| [Resource References](ascript-patterns-resource-references.md)                                       | Reference variables and actions directly in reasoning instructions                                                                                         |
+| [System Overrides](ascript-patterns-system-overrides.md)                                             | Override global system instructions to change behavior per subagent                                                                                        |
+| [Transitions](ascript-patterns-transitions.md)                                                       | Move execution between subagents with `@utils.transition to`                                                                                               |
+| [Variables](ascript-patterns-variables.md)                                                           | Store and use state effectively across subagents                                                                                                           |
+| [Variables (List)](ascript-patterns-var-list.md)                                                     | Store variables in a list, also called a collection. Use a variable from your list just like a custom variable. Use an index to iterate through your list. |
 
 ## General Guidance
 
@@ -43,3 +43,4 @@ When building agents with Agent Script, keep these principles in mind:
 - [An Agentforce Guide to Context Engineering](https://help.salesforce.com/s/articleView?id=ai.agent_context_engineering.htm)
 - [Agent Script Examples](../ascript-examples.md)
 - [Agent Script Reference](../reference/ascript-reference.md)
+- _Trailhead_: [Agent Script Basics](https://trailhead.salesforce.com/content/learn/modules/agent-script-basics)

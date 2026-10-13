@@ -39,7 +39,6 @@ The top-level properties are called blocks. For instance, we call this section t
 ```sfdocs-code {"lang":"agentscript", "title": "Agent Script Block"}
 config:
     developer_name: "Demo_Agent_1"
-    default_agent_user: "digitalagent.demo@salesforce.com"
     agent_label: "Demo Agent"
     description: "This is my demo agent"
 ```
@@ -98,6 +97,7 @@ You can access resources, such as actions, subagents, and variables, using the `
 
 - `@actions.<action_name>`: References an action.
 - `@subagent.<subagent_name>`: References a subagent.
+- `@connected_subagent.<connected_subagent_name>`: References a connected subagent.
 - `@variables.<variable_name>`: References a variable.
 - `@outputs.<output_name>`: References an action output.
 
@@ -141,3 +141,8 @@ You can specify comments in Agent Script with the pound (`#`) symbol followed by
 ```sfdocs-code {"lang":"agentscript", "title": "Comments"}
 # This is an agent sample script that demonstrates deterministic behavior
 ```
+
+## See Also
+
+- _Trailhead_: [Programmatic Instructions in Agentforce](https://trailhead.salesforce.com/content/learn/modules/programmatic-instructions-in-agentforce)
+- _Trailhead_: [Agent Script Basics](https://trailhead.salesforce.com/content/learn/modules/agent-script-basics)

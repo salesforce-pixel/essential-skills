@@ -8,7 +8,7 @@ A *skill* is a folder containing a `SKILL.md` (instructions + metadata) and any 
 
 | Skill | What it does |
 |-------|--------------|
-| [`agentscript`](skills/agentscript) | Authoritative Salesforce Agent Script (AgentScript) language reference — syntax, blocks, flow of control, model configuration, patterns, complete example agents, and agent metadata/package.xml deployment reference. Grounds any `.agent` file you write or review against correct syntax instead of relying on memory. |
+| [`agentscript`](skills/agentscript) | Authoritative Salesforce Agent Script (AgentScript) language reference — syntax, blocks, flow of control, model configuration, voice/modality configuration, patterns, complete example agents, and agent metadata/package.xml deployment reference (API v68 and v67-earlier). Grounds any `.agent` file you write or review against correct syntax instead of relying on memory. |
 | [`crafting-demo-data`](skills/crafting-demo-data) | Populates and refreshes Salesforce **demo** orgs with realistic, story-coherent data. CREATE new narrative-coherent records (schema-first, dependency-ordered, idempotent via External ID + upsert) or REFRESH stale data in place (roll close dates forward, re-time activities). Org-safety check refuses to write to production; every created record is tagged for clean teardown. |
 | [`fetching-salesforce-docs`](skills/fetching-salesforce-docs) | Reliably retrieves official Salesforce documentation (developer.salesforce.com, help.salesforce.com, architect/admin, Lightning Design System), including JS-heavy and shell-rendered pages, via a browser-rendered extractor. Self-provisions an isolated Python + Playwright runtime on first use. |
 
@@ -74,11 +74,15 @@ rsync -a --delete --exclude='__pycache__' \
   /path/to/your/project/.claude/skills/
 ```
 
-To install **all** skills this way, point `rsync` at the whole `skills/` directory (note the trailing slash on the source, so its *contents* land in the destination):
+To install **all** skills this way, loop over the skill folders so `--delete` only cleans inside each skill and never touches other skills you already have in `~/.claude/skills/`:
 
 ```bash
-rsync -a --delete --exclude='__pycache__' skills/ ~/.claude/skills/
+for s in skills/*/; do
+  rsync -a --delete --exclude='__pycache__' "${s%/}" ~/.claude/skills/
+done
 ```
+
+> ⚠️ Don't run `rsync -a --delete skills/ ~/.claude/skills/` — with the trailing slash, `--delete` makes the destination mirror this repo and **removes every other skill** you have installed.
 </details>
 
 <details>
@@ -98,7 +102,7 @@ cd essential-skills && git pull
 rsync -a --delete --exclude='__pycache__' skills/agentscript ~/.claude/skills/
 ```
 
-**How to tell which version you have:** open the skill's `SKILL.md` and check the `version` field in the YAML frontmatter (e.g. `version: "1.2"`). After overwriting, restart Claude Code so it re-reads the skill directory.
+**How to tell which version you have:** open the skill's `SKILL.md` and check `metadata.version` in the YAML frontmatter (e.g. `version: "2.0"` under `metadata:`). After overwriting, restart Claude Code so it re-reads the skill directory.
 
 ## Activating a skill in Claude Code
 

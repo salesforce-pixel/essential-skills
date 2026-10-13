@@ -11,7 +11,8 @@ Use it alongside the `agentforce-adlc:developing-agentforce` skill, which covers
 ## Use it for
 
 - Writing, editing, reviewing, or debugging Agent Script / `.agent` files
-- Looking up exact syntax: `subagent`/topic blocks, `start_agent`, reasoning, variables, actions, tools, utils, transitions, conditionals, action chaining, multi-turn flows, `model_config`
+- Looking up exact syntax: `subagent`/topic blocks, `start_agent`, reasoning, variables, actions, tools, utils, transitions, conditionals, action chaining, multi-turn flows, `ask for` (Beta), system and list variables, `model_config`
+- Configuring voice agents: `modality voice` and the TTS voice model / persona catalog
 - Grounding generated Agent Script against correct syntax before shipping it
 - Looking up the metadata shape (`AiAuthoringBundle`, `Bot`/`BotVersion`) and `package.xml` manifests behind an agent, when you need the *shape* rather than the full deploy workflow
 
@@ -27,13 +28,15 @@ agentscript/
     ├── ascript-blocks.md                # All block types
     ├── ascript-flow.md                  # Flow of control
     ├── ascript-model.md                 # model_config: per-agent/subagent model overrides
+    ├── ascript-voice.md                 # Voice / modality configuration
+    ├── ascript-voice-catalog*.md        # TTS voice models & persona IDs (5 files)
     ├── ascript-manage.md                # Managing/lifecycle of agents
     ├── ascript-examples.md              # Index of example agents
     ├── ascript-download-documentation.md
     ├── examples/                        # Complete example agent scripts
     ├── patterns/                        # Common Agent Script patterns
     ├── reference/                       # Master syntax & keyword reference
-    └── deploy-metadata/                 # Agent metadata & package.xml reference
+    └── deploy-metadata/                 # Agent metadata & package.xml reference (API v68; v67-earlier in *67.md)
 ```
 
 ## Install
@@ -83,7 +86,7 @@ Restart Claude Code (or start a new session) so it re-scans the skills directory
 cd essential-skills && git pull
 rsync -a --delete skills/agentscript ~/.claude/skills/
 ```
-Check the version you have in `SKILL.md` → `metadata.version` (and the changelog comment just below the frontmatter).
+Check the version you have in `SKILL.md` → `metadata.version` (currently `2.0`) (and the changelog comment just below the frontmatter).
 
 ## Requirements
 

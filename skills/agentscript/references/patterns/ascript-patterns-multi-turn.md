@@ -72,3 +72,4 @@ subagent permission:
 - Pattern: [Transitions](ascript-patterns-transitions.md)
 - Pattern: [Conditionals](ascript-patterns-conditionals.md)
 - Pattern: [Enforce Required Workflows for a Subagent](ascript-patterns-required-flow.md)
+- _Trailhead_: [Agent Script Basics: Manage State Across a Multi-Turn Conversation](https://trailhead.salesforce.com/content/learn/modules/agent-script-basics)

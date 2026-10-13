@@ -1,6 +1,6 @@
 # Agent Script Reference: Conditional Expressions
 
-`if` and `else` conditions deterministically specify what actions to take or which prompts to include. To specify complex conditions, use parentheses `()` to group `and` and `or` operators within a condition.
+`if`, `else if`, and `else` conditions deterministically specify what actions to take or which prompts to include. To specify complex conditions, use parentheses `()` to group `and` and `or` operators within a condition.
 
 For example, you can check a variable's value and then run an action based on the result:
 
@@ -53,6 +53,24 @@ reasoning:
         | If the customer's question is too vague, ask for more details.
 ```
 
+Use `else if` to specify mutually exclusive conditions.
+
+```sfdocs-code {"lang":"agentscript", "title": "Example: Specify Mutually Exclusive Conditions With  else if "}
+subagent ReportCurrentState:
+    description: |
+        Route to this subagent if the user wants to know the current state
+    reasoning:
+        instructions: ->
+            if @variables.state == "A":
+                | Tell the user we're in state A.
+            else if @variables.state == "B":
+                | Tell the user we're in state B.
+            else if @variables.state == "B":
+                | Tell the user we're in state C.
+            else:
+                | Chat about the state of a local sports team.
+```
+
 You can check whether a variable has a value.
 
 ```sfdocs-code {"lang":"agentscript", "title": "Check Whether a Variable Has a Value"}
@@ -69,11 +87,8 @@ reasoning:
         | When would you like to schedule this appointment?
 ```
 
-:::note
-Currently, Agent Script supports `if` and `else` logic, but it doesn't support `else if` logic after an `if` statement.
-:::
-
 **Related Topics**
 
 - [Reasoning Instructions](ascript-ref-instructions.md)
 - [Supported Operators](ascript-ref-operators.md)
+- _Trailhead_: [Programmatic Instructions in Agentforce: Use Conditional Logic to Send the Right Prompt for Each Context](https://trailhead.salesforce.com/content/learn/modules/programmatic-instructions-in-agentforce)

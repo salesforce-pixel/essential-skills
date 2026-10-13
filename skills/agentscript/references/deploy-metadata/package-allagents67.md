@@ -1,6 +1,6 @@
-# Manifest Defining All Agents
+# Manifest Defining All Agents (v67 and Earlier)
 
-This example manifest file specifies the metadata for all agents, including legacy agents The file also specifies the metadata for **all** an org's flows, prompt templates, and Apex classes.
+This example manifest file specifies the metadata for all agents, including legacy agents, using API version 67 and earlier. The file also specifies the metadata for **all** an org's flows, prompt templates, and Apex classes.
 
 :::note
 To prevent very large retrievals from large orgs, list specific metadata types rather than using the "`*`" wildcard.
