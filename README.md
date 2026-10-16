@@ -13,7 +13,32 @@ A *skill* is a folder containing a `SKILL.md` (instructions + metadata) and any 
 | [`crafting-demo-data`](skills/crafting-demo-data) | Populates and refreshes Salesforce **demo** orgs with realistic, story-coherent data. CREATE new narrative-coherent records (schema-first, dependency-ordered, idempotent via External ID + upsert) or REFRESH stale data in place (roll close dates forward, re-time activities). Org-safety check refuses to write to production; every created record is tagged for clean teardown. |
 | [`fetching-salesforce-docs`](skills/fetching-salesforce-docs) | Reliably retrieves official Salesforce documentation (developer.salesforce.com, help.salesforce.com, architect/admin, Lightning Design System), including JS-heavy and shell-rendered pages, via a browser-rendered extractor. Self-provisions an isolated Python + Playwright runtime on first use. |
 
-## Installing a skill
+## Install as a Claude Code plugin (recommended)
+
+This repo is also a Claude Code plugin marketplace. Installing the `essential-skills` plugin adds **all four skills** at once, works the same on macOS, Windows, and Linux, and can be updated later with one command — no zips, hidden folders, or copying.
+
+Inside Claude Code, run:
+
+```
+/plugin marketplace add salesforce-pixel/essential-skills
+/plugin install essential-skills@essential-skills
+```
+
+On Claude Code 2.1.275 or later this also works as one step:
+
+```
+/plugin install essential-skills --marketplace salesforce-pixel/essential-skills
+```
+
+Restart Claude Code and the skills are available. Plugin skills are namespaced, so the slash commands become e.g. `/essential-skills:agentscript`; they still trigger automatically when a request matches.
+
+**Updating:** run `claude plugin marketplace update essential-skills` and then `claude plugin update essential-skills@essential-skills` from a terminal, then restart Claude Code.
+
+> If you previously copied any of these skills into `~/.claude/skills/` by hand, delete those folders after installing the plugin so you don't end up with each skill twice.
+
+## Installing a skill manually
+
+If you'd rather copy skill folders yourself (or only want some of them), use the options below.
 
 Skills live in your Claude Code skills directory:
 
@@ -107,7 +132,7 @@ rsync -a --delete --exclude='__pycache__' skills/agentscript ~/.claude/skills/
 
 ## Activating a skill in Claude Code
 
-Once installed, Claude Code auto-discovers the skill and triggers it when your request matches its description. You can also invoke it explicitly with a slash command, e.g. `/agentscript`.
+Once installed, Claude Code auto-discovers the skill and triggers it when your request matches its description. You can also invoke it explicitly with a slash command, e.g. `/agentscript` (or `/essential-skills:agentscript` when installed as a plugin).
 
 ## Requirements
 

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "essential-skills",
+  "description": "A collection of Claude Code Agent Skills for Salesforce and Agentforce work.",
+  "owner": {
+    "name": "salesforce-pixel"
+  },
+  "plugins": [
+    {
+      "name": "essential-skills",
+      "description": "Agentforce agent metadata retrieve/deploy, Agent Script language reference, Salesforce demo data crafting, and official Salesforce docs retrieval.",
+      "source": "./",
+      "strict": false,
+      "category": "development",
+      "keywords": ["salesforce", "agentforce", "agentscript", "metadata", "demo-data", "documentation"],
+      "license": "MIT"
+    }
+  ]
+}
