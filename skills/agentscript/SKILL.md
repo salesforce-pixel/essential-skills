@@ -7,18 +7,47 @@ description: >-
   editing, reviewing, or debugging Agent Script / .agent files; looking up Agent
   Script syntax (subagents/topics, start_agent, reasoning, instructions, variables,
   actions, tools, utils, transitions, conditionals, action chaining, multi-turn
-  flows, ask for (Beta), system and list variables, model_config, the runtime and
-  file_upload config sub-blocks, and voice / modality configuration incl. the
-  voice model catalog); or grounding generated Agent Script against correct syntax.
+  flows, ask for (Beta), system and list variables, model_config (model,
+  temperature, max_tokens, top_p), the context block (memory, user_profile), the
+  runtime and file_upload config sub-blocks, and voice / modality configuration
+  incl. the voice model catalog and last_reply barge-in handling); or grounding generated Agent Script against correct syntax.
   Use ALONGSIDE the agentforce-adlc:developing-agentforce skill, which covers the
   ADLC workflow and CLI commands; this skill is the language grounding plus
   supporting metadata/deploy reference.
 metadata:
-  version: "2.0"
+  version: "2.1"
 ---
 
 <!--
 Changelog
+2.1 — Full replace of 37 pages from the LIVE doc site (2026-11-01), fetched as
+      markdown from developer.salesforce.com/docs/ai/agentforce/guide/<page>.md
+      (no word-by-word diffing). Covers every top-level ascript-* page, all
+      patterns/ pages, and all reference/ pages. NOT refreshed (still the
+      2026-09-17 zip): agent-script.md, ascript-download-documentation.md,
+      examples/*, deploy-metadata/*.
+      • 26 of the 37 pages changed; 11 came back byte-identical.
+      • Conversion: site-absolute /docs/ai/agentforce/guide/*.md links re-pointed
+        to relative paths in the flattened layout; links to pages outside this
+        bundle (agent-dx, supported-models, lightning-types, testing-api,
+        agents-metadatav67) now go to full developer.salesforce.com URLs instead
+        of dead relative paths; standalone images → placeholder; linked images
+        → plain text link. Upstream "\&" in help.salesforce URLs left as-is.
+      • Notable new content:
+        - ascript-blocks.md: new top-level `context` block (`memory`,
+          `user_profile`).
+        - ascript-model.md: retitled "Configure Models in Agent Script";
+          `model_config` now documents `temperature`, `max_tokens`, `top_p`
+          and a Supported Models section.
+        - ascript-voice.md: much larger — pronunciation dictionary,
+          per-language voice settings, legacy-to-nested key map, mixed-format
+          error troubleshooting, caller-interruption handling, full sample.
+        - reference/ascript-ref-variables-system.md: new `last_reply`
+          (voice barge-in: `interrupted`, `interrupted_heard_text`).
+        - reference/ascript-ref-variables.md: concatenating string variables.
+      • The 1.3 KNOWN DANGLING LINK (current_modality) is resolved.
+      • Pre-existing broken relative links remain in the un-refreshed files
+        (agent-script.md, examples/*, deploy-metadata/*).
 2.0 — Full replace from the 2026-09-17 AgentScriptDocs.zip release (no diffing;
       the whole references/ tree was swapped for the new bundle, then images
       re-stripped to the placeholder convention and cross-folder links re-pointed
@@ -100,8 +129,9 @@ Changelog
 # Agent Script Reference
 
 Authoritative documentation bundle for **Salesforce Agent Script** (the language for
-building Agentforce agents in Agentforce Builder). Source: official Salesforce docs
-(`AgentScriptDocs.zip`, last updated 2026-09-17), unzipped under `references/`.
+building Agentforce agents in Agentforce Builder). Source: official Salesforce docs under `references/` — language, patterns, and
+reference pages synced from the live doc site on 2026-11-01; overview, examples, and
+deploy-metadata pages from the 2026-09-17 `AgentScriptDocs.zip`.
 
 Use this to ground any Agent Script you write or review against correct syntax and
 established patterns — do not rely on memory for syntax. Open the specific reference
@@ -123,13 +153,13 @@ file relevant to the task rather than loading everything.
 - `references/agent-script.md` — What Agent Script is, why determinism + LLM reasoning, a full minimal example.
 - `references/ascript-lang.md` — Language characteristics: comments, indentation, the `->` (logic) vs `|` (prompt) distinction.
 - `references/ascript-blocks.md` — All block types: `system`, `config` (incl. the
-  `runtime` and `file_upload` sub-blocks), `access`, `language`, `modality voice`,
+  `runtime` and `file_upload` sub-blocks), `context` (memory, user_profile), `access`, `language`, `modality voice`,
   `variables`, `start_agent`, `subagent`, `connected_subagent` (Beta), `connection`,
   `reasoning`.
 - `references/ascript-flow.md` — Flow of control: how reasoning loops, transitions, and deterministic execution interleave.
-- `references/ascript-model.md` — `model_config`: overriding the org-default model per agent/subagent/router, multiple-model agents, `EinsteinHyperClassifier`.
+- `references/ascript-model.md` — `model_config`: overriding the org-default model and tuning `temperature` / `max_tokens` / `top_p` per agent/subagent/router, supported models, `EinsteinHyperClassifier`.
 - `references/ascript-manage.md` — Managing/lifecycle of Agent Script agents.
-- `references/ascript-voice.md` — Configuring TTS voice models for voice agents (`modality voice`), per-language defaults.
+- `references/ascript-voice.md` — Configuring voice agents (`modality voice`): TTS models, per-language settings, pronunciation dictionary, legacy-to-nested key map, handling caller interruptions.
 - `references/ascript-voice-catalog.md` — Voice catalog index; per-model persona/Voice ID lists in `ascript-voice-catalog-v3-conversational.md`, `-flash-2.md`, `-flash-2-5.md`, `-kotoba.md`.
 
 ## Reference — syntax & semantics (`references/reference/`)
@@ -139,7 +169,7 @@ file relevant to the task rather than loading everything.
 - `ascript-ref-tools.md` — Tools (reasoning actions) the LLM may call; `available when`; referencing a subagent as a tool.
 - `ascript-ref-utils.md` — Built-in utils: `@utils.escalate`, `@utils.setVariables`, `@utils.transition to`.
 - `ascript-ref-variables.md` — Variables: `mutable`, `linked`, slot-fill `...`, scope, declaration syntax.
-- `ascript-ref-variables-system.md` — Read-only `@system_variables.*` (e.g. `current_modality`, `uploaded_files`).
+- `ascript-ref-variables-system.md` — Read-only `@system_variables.*` (`user_input`, `current_modality`, `current_connection`, `last_reply`, `uploaded_files`).
 - `ascript-ref-variables-list.md` — List variables: declaring, initializing, and working with lists.
 - `ascript-ref-ask-for.md` — `ask for` (Beta): collect structured customer input one field at a time into variables.
 - `ascript-ref-instructions.md` — Reasoning instructions: prompt vs logic instructions, `{!expression}` resolution.
@@ -190,5 +220,5 @@ ADLC workflow itself (still `developing-agentforce`'s job).
   each keyword against `reference/ascript-reference.md`.
 - `.agent` files in a Salesforce DX project live under an `aiAuthoringBundle`; use the
   developing-agentforce skill + `sf agent` CLI for generate/preview/publish/test/deploy.
-- These docs are a local snapshot of the 2026-09-17 `AgentScriptDocs.zip`. If
+- These docs are a local snapshot (live site 2026-11-01 / zip 2026-09-17). If
   something looks newer in the org, trust the org and flag the discrepancy.

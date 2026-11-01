@@ -11,7 +11,7 @@ Use it alongside the `agentforce-adlc:developing-agentforce` skill, which covers
 ## Use it for
 
 - Writing, editing, reviewing, or debugging Agent Script / `.agent` files
-- Looking up exact syntax: `subagent`/topic blocks, `start_agent`, reasoning, variables, actions, tools, utils, transitions, conditionals, action chaining, multi-turn flows, `ask for` (Beta), system and list variables, `model_config`
+- Looking up exact syntax: `subagent`/topic blocks, `start_agent`, reasoning, variables, actions, tools, utils, transitions, conditionals, action chaining, multi-turn flows, `ask for` (Beta), system and list variables, `model_config` (incl. `temperature` / `max_tokens` / `top_p`), the `context` block (memory, user profile)
 - Configuring voice agents: `modality voice` and the TTS voice model / persona catalog
 - Grounding generated Agent Script against correct syntax before shipping it
 - Looking up the metadata shape (`AiAuthoringBundle`, `Bot`/`BotVersion`) and `package.xml` manifests behind an agent, when you need the *shape* rather than the full deploy workflow
@@ -86,7 +86,7 @@ Restart Claude Code (or start a new session) so it re-scans the skills directory
 cd essential-skills && git pull
 rsync -a --delete skills/agentscript ~/.claude/skills/
 ```
-Check the version you have in `SKILL.md` → `metadata.version` (currently `2.0`) (and the changelog comment just below the frontmatter).
+Check the version you have in `SKILL.md` → `metadata.version` (currently `2.1`) (and the changelog comment just below the frontmatter).
 
 ## Requirements
 

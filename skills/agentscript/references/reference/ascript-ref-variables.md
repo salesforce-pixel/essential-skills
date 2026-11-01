@@ -2,7 +2,7 @@
 
 Variables let agents deterministically remember information across conversation turns, track progress, and maintain context throughout the session. You define all variables in the `variables` block, and all subagents in the agent can access the variables.
 
-This page covers custom and linked variables. For predefined runtime variables, see [Agent Script Reference: System Variables](./ascript-ref-variables-system.md).
+This page covers custom and linked variables. For predefined runtime variables, see [Agent Script Reference: System Variables](ascript-ref-variables-system.md).
 
 - **[custom variable](#custom-variables):** You can initialize a variable with a default value, and the agent can change the variable's value.
 - **[linked variable](#linked-variables):** The value of a linked variable is tied to an output such as an action's output. Linked variables can't have a default value.
@@ -25,7 +25,7 @@ Variable names must follow Salesforce developer name standards:
 - Begin with a letter, not an underscore.
 - Contain only alphanumeric characters and underscores.
 - Can't end with underscore.
-- Can't contain consecutive underscores (\_\_).
+- Can't contain consecutive underscores (\__).
 - Maximum length of 80 characters.
 
 ## Referencing Variables
@@ -46,6 +46,44 @@ reasoning:
         | Always use {!@variables.Customer_Email} for the customer's email address.
 ```
 
+## Concatenating (Appending) String Variables
+
+To concatenate, or append, string variables, use the `+` operator. For example, this expression combines the salutation, first name, and last name into a single variable, with a space between each value.
+
+```sfdocs-code {"lang":"agentscript", "title": "Concatenate String Variables"}
+set @variables.full_name = @variables.salutation + " " + @variables.first_name + " " + @variables.last_name
+```
+
+You can also use `concat()` to join string values. The `concat()` function uses the same separator between every value.
+
+```sfdocs-code {"lang":"agentscript", "title": "concat() Syntax"}
+concat(<value1>, <value2>, ..., sep="<separator>")
+```
+
+- `<value1>, <value2>, ...` - The string values to join, in order. Each value can be a string variable or a string literal, such as `"Hello"`. Each value must be a string. If you pass a value of another type, such as a number, boolean, or `None`, you get an error.
+- `sep` - Optional. The string to insert between each value. If you omit `sep`, the values are joined with no separator. `sep` must be a string.
+
+For example, this snippet joins the first and last months of ski season into a single value, with a hyphen between them. The `SkiSeason` variable is set to `"November-May"`.
+
+```sfdocs-code {"lang":"agentscript", "title": "Concatenate String Variables With concat()"}
+variables:
+    FirstMonth: mutable string = "November"
+        description: "The first month of ski season"
+    LastMonth: mutable string = "May"
+        description: "The last month of ski season"
+    # No default value. concat() sets the value at runtime.
+    SkiSeason: mutable string
+        description: "The length of ski season"
+
+# ...
+
+    reasoning:
+        instructions: ->
+            # Set the variable before the prompt text so the LLM has the joined value.
+            set @variables.SkiSeason = concat(@variables.FirstMonth, @variables.LastMonth, sep="-")
+            | Greet the user and answer their question. Tell them ski season runs {!@variables.SkiSeason}.
+```
+
 ## Custom Variables
 
 Custom variables have these properties:
@@ -53,7 +91,7 @@ Custom variables have these properties:
 - `mutable` - Optional. Allows the agent to change the variable's value. To ensure a variable's value is never changed, define the variable without `mutable`.
 - `description` - describes the variable. Optional. If you want the LLM to use reasoning to set the variable's value, include a description to help the LLM set the value correctly. See [Let the LLM set variables with user-entered information (slot filling)](../patterns/ascript-patterns-variables.md#let-the-llm-set-variables-with-user-entered-information-slot-filling).
 - `label` - Optional. The variable's name as displayed in the UI. By default, the description is generated from the name. For example, if your variable's name is `my_var`, the UI displays the label `My Var`.
-- `visibility` - Optional. Default value is `Internal`. Set visibility to `External` to allow an API to set the variable's value, or to change the variable's value when [testing the agent in simulate mode](https://help.salesforce.com/s/articleView?id=ai.agent_test_in_builder.htm&language=en_US&type=5).
+- `visibility` - Optional. Default value is `Internal`. Set visibility to `External` to allow an API to set the variable's value, or to change the variable's value when [testing the agent in simulate mode](https://help.salesforce.com/s/articleView?id=ai.agent_test_in_builder.htm\&language=en_US\&type=5).
 
 ```sfdocs-code {"lang":"agentscript", "title": "Example: Define Custom Variables"}
 variables:
@@ -82,7 +120,7 @@ Custom variables can have these types:
 
 Use `None` to check whether a variable has a value. You can use `None` with any variable type. For a string variable, you can also use `""` to check if the variable is set to an empty string. When checking string variables in conditional statements, you might want to use both `None` and `""`.
 
-For more information, see [Agent Script Reference: Conditional Expressions](./ascript-ref-expressions.md).
+For more information, see [Agent Script Reference: Conditional Expressions](ascript-ref-expressions.md).
 
 ## Linked Variables
 
@@ -129,7 +167,7 @@ For examples and patterns using variables, see [Agent Script Pattern: Using Vari
 
 - Pattern: [Using Variables Effectively](../patterns/ascript-patterns-variables.md)
 - Pattern: [Using List Variables](../patterns/ascript-patterns-var-list.md)
-- Reference: [System Variables](./ascript-ref-variables-system.md)
-- Reference: [List Variables](./ascript-ref-variables-list.md)
+- Reference: [System Variables](ascript-ref-variables-system.md)
+- Reference: [List Variables](ascript-ref-variables-list.md)
 - [Flow of Control](../ascript-flow.md)
 - Reference: [Utils](ascript-ref-utils.md)

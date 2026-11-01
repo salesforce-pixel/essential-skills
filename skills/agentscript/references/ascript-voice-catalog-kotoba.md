@@ -4,10 +4,10 @@ This page lists the Kotoba voice personas and the locales each one supports. Kot
 
 ## Japanese - ja
 
-| Voice | Gender | Voice ID | Description |
-| :---- | :----- | :------- | :---------- |
-| Azawa (default) | Male | `e5d63b40f254` | Natural male voice with a composed and conversational Japanese delivery. |
-| Me | Female | `43aa916c0e61` | Natural female voice with a warm and approachable Japanese delivery. |
+| Voice           | Gender | Voice ID       | Description                                                              |
+| :-------------- | :----- | :------------- | :----------------------------------------------------------------------- |
+| Azawa (default) | Male   | `e5d63b40f254` | Natural male voice with a composed and conversational Japanese delivery. |
+| Me              | Female | `43aa916c0e61` | Natural female voice with a warm and approachable Japanese delivery.     |
 
 ## Related Topics
 

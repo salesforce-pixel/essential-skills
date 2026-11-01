@@ -4,7 +4,7 @@ Use `available when` to control which subagents or actions are available to the 
 
 ## Why Use This Pattern
 
-When your business conditions aren't met, this pattern allows you to hide the subagent or action entirely, simplifying the LLM's decision-making and enforcing business rules about feature availability. Without filtering, customers might convince the LLM to use features that aren't allowed. Or, the LLM might make reasoning errors during complex workflows and prolonged conversations, due to prompt noise and context drift. See [Required Subagent Workflow](./ascript-patterns-required-flow.md) for a related pattern.
+When your business conditions aren't met, this pattern allows you to hide the subagent or action entirely, simplifying the LLM's decision-making and enforcing business rules about feature availability. Without filtering, customers might convince the LLM to use features that aren't allowed. Or, the LLM might make reasoning errors during complex workflows and prolonged conversations, due to prompt noise and context drift. See [Required Subagent Workflow](ascript-patterns-required-flow.md) for a related pattern.
 
 **Pattern Examples**:
 
@@ -69,8 +69,8 @@ Keep in mind that the LLM can call any **available** reasoning action, even if y
 
 ## Related Topics
 
-- Pattern: [Required Subagent Workflow](./ascript-patterns-required-flow.md)
+- Pattern: [Required Subagent Workflow](ascript-patterns-required-flow.md)
 - Reference: [Tools (Reasoning Actions)](../reference/ascript-ref-tools.md)
 - Reference: [Conditional Expressions](../reference/ascript-ref-expressions.md)
 - Reference: [Start Agent Block](../ascript-blocks.md#start-agent-block)
-- _Trailhead_: [Programmatic Instructions in Agentforce: Enforce Business Rules with Variables and Action Filters](https://trailhead.salesforce.com/content/learn/modules/programmatic-instructions-in-agentforce)
+- *Trailhead*: [Programmatic Instructions in Agentforce: Enforce Business Rules with Variables and Action Filters](https://trailhead.salesforce.com/content/learn/modules/programmatic-instructions-in-agentforce)

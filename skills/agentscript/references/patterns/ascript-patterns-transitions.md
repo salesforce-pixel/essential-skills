@@ -54,7 +54,7 @@ reasoning:
       available when @variables.verified == True
 ```
 
-See the [Filtering Pattern](./ascript-patterns-filtering.md).
+See the [Filtering Pattern](ascript-patterns-filtering.md).
 
 ### Transitions in Instructions
 

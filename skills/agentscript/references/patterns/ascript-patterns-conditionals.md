@@ -55,7 +55,7 @@ reasoning:
       transition to @subagent.vip_support
 ```
 
-The transition happens immediately, before the LLM processes any other instructions. See [Required Subagent Flow](./ascript-patterns-required-flow.md) for related patterns.
+The transition happens immediately, before the LLM processes any other instructions. See [Required Subagent Flow](ascript-patterns-required-flow.md) for related patterns.
 
 ## If/Else Logic
 
@@ -94,8 +94,8 @@ reasoning:
 
 ## Related Topics
 
-- Pattern: [Required Subagent Flow](./ascript-patterns-required-flow.md)
+- Pattern: [Required Subagent Flow](ascript-patterns-required-flow.md)
 - Reference: [Conditional Expressions](../reference/ascript-ref-expressions.md)
 - Reference: [Supported Operators](../reference/ascript-ref-operators.md)
 - Reference: [Reasoning Instructions](../reference/ascript-ref-instructions.md)
-- _Trailhead_: [Programmatic Instructions in Agentforce: Use Conditional Logic to Send the Right Prompt for Each Context](https://trailhead.salesforce.com/content/learn/modules/programmatic-instructions-in-agentforce)
+- *Trailhead*: [Programmatic Instructions in Agentforce: Use Conditional Logic to Send the Right Prompt for Each Context](https://trailhead.salesforce.com/content/learn/modules/programmatic-instructions-in-agentforce)

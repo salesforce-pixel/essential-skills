@@ -27,5 +27,5 @@ Kotoba is a voice model for Japanese (`ja`) and provides the default voice for t
 ## Related Topics
 
 - [Configure Voice Models in Agent Script](ascript-voice.md)
-- [Agent Script Blocks](./ascript-blocks.md)
+- [Agent Script Blocks](ascript-blocks.md)
 - [ElevenLabs](https://elevenlabs.io/)

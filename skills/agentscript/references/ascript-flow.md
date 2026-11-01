@@ -99,5 +99,5 @@ For more about transitions and subagents, see [Referencing a Subagent as a Tool]
 
 ## Related Topics
 
-- [Agent Script Patterns](./patterns/ascript-patterns.md)
+- [Agent Script Patterns](patterns/ascript-patterns.md)
 - [Agent Script Reference](reference/ascript-reference.md)
