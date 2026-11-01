@@ -1,6 +1,6 @@
 # Agent Script Reference: List Variables
 
-A [custom](./ascript-ref-variables.md) variable can be a list of values. A list can hold any supported variable type, such as strings, booleans, numbers, or objects.
+A [custom](ascript-ref-variables.md) variable can be a list of values. A list can hold any supported variable type, such as strings, booleans, numbers, or objects.
 
 ## Creating a List Variable
 
@@ -77,7 +77,7 @@ You can use these operations on your list variables.
 
 - Pattern: [Using Variables Effectively](../patterns/ascript-patterns-variables.md)
 - Pattern: [Using List Variables](../patterns/ascript-patterns-var-list.md)
-- Reference: [System Variables](./ascript-ref-variables-system.md)
-- Reference: [Custom Variables](./ascript-ref-variables.md)
+- Reference: [System Variables](ascript-ref-variables-system.md)
+- Reference: [Custom Variables](ascript-ref-variables.md)
 - [Flow of Control](../ascript-flow.md)
 - Reference: [Utils](ascript-ref-utils.md)

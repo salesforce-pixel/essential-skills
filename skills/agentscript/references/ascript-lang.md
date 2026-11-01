@@ -13,13 +13,13 @@ Agent Script combines deterministic logic with LLM reasoning in a single workflo
 - **Logic instructions** (`->`) run deterministically every time. Use them for business rules, running actions, setting variables, and conditional branching.
 - **Prompt instructions** (`|`) are natural language sent to the LLM. The LLM interprets these instructions and decides how to respond to the customer.
 
-See [Flow of Control](ascript-flow.md), [Agent Script Patterns](./patterns/ascript-patterns.md), and [Reasoning Instructions](reference/ascript-ref-instructions.md).
+See [Flow of Control](ascript-flow.md), [Agent Script Patterns](patterns/ascript-patterns.md), and [Reasoning Instructions](reference/ascript-ref-instructions.md).
 
 ## Declarative With Procedural Components
 
 Agent Script has elements of both declarative and procedural languages so that you can build an agent that is both predictable and easy to maintain.
 
-- A declarative language is a language where you directly _declare_ what you want rather than having to worry about the exact flow step by step. This type of programming language gives you the power to define and customize your agent, but without having to worry about the detailed flow. The basic [Agent Script Blocks](ascript-blocks.md) resemble a declarative language.
+- A declarative language is a language where you directly *declare* what you want rather than having to worry about the exact flow step by step. This type of programming language gives you the power to define and customize your agent, but without having to worry about the detailed flow. The basic [Agent Script Blocks](ascript-blocks.md) resemble a declarative language.
 - A procedural language is a language where you specify how to execute commands in a specific order. We use elements from procedural languages so that you can specify instructions in logical steps. The logic in [reasoning instructions](reference/ascript-ref-instructions.md) resemble a procedural language.
 
 ## Human-Readable
@@ -144,5 +144,5 @@ You can specify comments in Agent Script with the pound (`#`) symbol followed by
 
 ## See Also
 
-- _Trailhead_: [Programmatic Instructions in Agentforce](https://trailhead.salesforce.com/content/learn/modules/programmatic-instructions-in-agentforce)
-- _Trailhead_: [Agent Script Basics](https://trailhead.salesforce.com/content/learn/modules/agent-script-basics)
+- *Trailhead*: [Programmatic Instructions in Agentforce](https://trailhead.salesforce.com/content/learn/modules/programmatic-instructions-in-agentforce)
+- *Trailhead*: [Agent Script Basics](https://trailhead.salesforce.com/content/learn/modules/agent-script-basics)

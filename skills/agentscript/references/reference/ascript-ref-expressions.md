@@ -91,4 +91,4 @@ reasoning:
 
 - [Reasoning Instructions](ascript-ref-instructions.md)
 - [Supported Operators](ascript-ref-operators.md)
-- _Trailhead_: [Programmatic Instructions in Agentforce: Use Conditional Logic to Send the Right Prompt for Each Context](https://trailhead.salesforce.com/content/learn/modules/programmatic-instructions-in-agentforce)
+- *Trailhead*: [Programmatic Instructions in Agentforce: Use Conditional Logic to Send the Right Prompt for Each Context](https://trailhead.salesforce.com/content/learn/modules/programmatic-instructions-in-agentforce)

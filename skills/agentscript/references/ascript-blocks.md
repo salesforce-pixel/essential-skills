@@ -125,6 +125,22 @@ access:
     default_agent_user: "service@example.com"
 ```
 
+## Context Block
+
+Use the context block to personalize the agent's responses. Add a top-level `context` block after `config`, and set `enabled` to `True` for each feature you want. Both features are off unless you enable them. Values are case-sensitive.
+
+```sfdocs-code {"lang":"agentscript", "title": "Context Block"}
+context:
+    memory:
+        enabled: True
+    user_profile:
+        enabled: True
+```
+
+Set `memory` to let the agent remember relevant details from a user's conversations, such as their preferences, and use them to personalize later conversations. Without memory, the agent starts each new conversation with no knowledge of earlier ones. Memory applies to all of the agent's users. If the agent is an Agentforce Employee agent in Lightning Experience, each user also opts in individually. If you later set `enabled` to `False`, the agent stops creating and using memories, but existing memories are preserved. For prerequisites, setup steps, and how users manage their memories, see [Enable Agent Memory](https://help.salesforce.com/s/articleView?id=ai.agent_memory_enable.htm\&type=5) in Salesforce Help.
+
+Set `user_profile` to let the agent use information about the current user, such as their name, locale, and time zone, to personalize responses. The platform adds the profile fields to the agent's prompt at runtime. They aren't script variables, so you can't reference them in your script. For setup steps and the available profile fields, see [Enable User Profile](https://help.salesforce.com/s/articleView?id=ai.agent_user_profile_enable.htm\&type=5) in Salesforce Help.
+
 ## Variables Block
 
 The variables block contains the list of global variables that the agent and script can use. See [Variables](reference/ascript-ref-variables.md).
@@ -163,63 +179,97 @@ modality voice:
                 speed: 0.9
 ```
 
-By default, a voice agent uses the ElevenLabs v3 Conversational model.
+The default voice model depends on the configured locale and the capabilities enabled for your org. Many locales use ElevenLabs v3 Conversational, while Japanese uses Kotoba. A locale's default can also be a Flash model. Check the available model and compatible persona for your target locale before adding an override. Use an explicit supported model when you need its particular capabilities, and verify the resulting voice through the intended channel.
 
-- To select a different voice model, see [Configure Voice Models in Agent Script](./ascript-voice.md).
-- To see the complete voice catalog, see [Voice Catalog for Agentforce Voice](./ascript-voice-catalog.md).
+- To select a different voice model, see [Configure Voice Models in Agent Script](ascript-voice.md).
+- To see the complete voice catalog, see [Voice Catalog for Agentforce Voice](ascript-voice-catalog.md).
 
 ### Voice Variables
 
-The `voice` variant supports these variables. All variables are optional except `voice_id` when configuring a live voice channel.
+The `voice` variant supports these variables. All paths are relative to `modality voice:`, and all variables are optional.
 
-| Variable                         | Type     | Range     | Description                                                                                                                                                            |
-| :------------------------------- | :------- | :-------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `voice_id`                       | string   | —         | Unique identifier for the outbound voice (for example, `"UgBBYS2sOqTuMpoF3BR0"`).                                                                                      |
-| `outbound_speed`                 | number   | 0.5 – 2.0 | Speech rate. `1.0` is normal; lower is slower, higher is faster.                                                                                                       |
-| `outbound_style_exaggeration`    | number   | 0.0 – 1.0 | How strongly the voice expresses its style. Higher values are more expressive; lower values are flatter and more consistent.                                           |
-| `inbound_filler_words_detection` | boolean  | —         | When `True`, filler words (like "um", "uh") in the customer's speech are detected and ignored.                                                                         |
-| `inbound_keywords`               | block    | —         | Keyword boost list. Contains a `keywords` sequence of strings that improves recognition for domain-specific terms.                                                     |
-| `pronunciation_dict`             | sequence | —         | Custom pronunciations for specialized words or names. Each entry has `grapheme` (written form), `phoneme` (phonetic spelling), and `type` (either `"IPA"` or `"CMU"`). |
-| `outbound_filler_sentences`      | sequence | —         | Short "thinking" phrases the agent says while an action is running, so the customer doesn't hear dead air. Each entry has a `waiting` list of strings.                 |
-| `additional_configs`             | block    | —         | Container for `speak_up_config`, `endpointing_config`, and `beepboop_config`. See [Additional Configs](#additional-configs).                                           |
+| Variable                                                                       | Type            | Range      | Description                                                                                                                                                                                                                                                                       |
+| :----------------------------------------------------------------------------- | :-------------- | :--------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `language.default_locale`                                                      | string          |            | Voice locale. If a voice `language` block is present, provide a supported default locale. The top-level `language` block separately configures the agent's text languages.                                                                                                        |
+| `language.additional_locales`                                                  | list of strings |            | Explicit list of additional voice locales. Also declare them in the top-level text `language` block.                                                                                                                                                                              |
+| `language_settings.<locale>.inbound` and `language_settings.<locale>.outbound` | block           |            | Per-locale overrides with the same structure as `inbound` and `outbound`.                                                                                                                                                                                                         |
+| `inbound.filler_words_detection`                                               | boolean         |            | When `True`, filler words (like "um" and "uh") in the customer's speech are detected and ignored.                                                                                                                                                                                 |
+| `inbound.keywords`                                                             | list of strings |            | Keywords that improve recognition of domain-specific terms.                                                                                                                                                                                                                       |
+| `inbound.model.id`                                                             | string          |            | ASR model identifier, where supported for the target locale and org.                                                                                                                                                                                                              |
+| `inbound.model.parameters`                                                     | block           |            | ASR model settings. The runtime can filter or ignore settings it doesn't support.                                                                                                                                                                                                 |
+| `outbound.persona_id`                                                          | string          |            | The catalog identifier of a persona that's compatible with the model and locale. Omit it to use the locale's default persona. Don't substitute a provider voice ID or a voice name. See [Voice Catalog for Agentforce Voice](ascript-voice-catalog.md). |
+| `outbound.model.id`                                                            | string          |            | TTS model identifier supported for the target locale and org. If omitted, model selection follows the locale's default.                                                                                                                                                           |
+| `outbound.model.parameters`                                                    | block           |            | Scalar model settings. The parser accepts them without checking every model-specific name or range, and the runtime can filter or ignore them.                                                                                                                                    |
+| `outbound.model.parameters.speed`                                              | number          | 0.7 to 1.2 | Speech rate for models that honor it, such as Flash v2 and v2.5. v3 Conversational doesn't use it. These are runtime-supported values, not a range the parser enforces.                                                                                                           |
+| `outbound.pronunciations`                                                      | list            |            | Custom pronunciations for specialized words or names. Each entry needs `grapheme` (written form), `phoneme` (phonetic spelling), and `type` (`"IPA"` or `"CMU"`).                                                                                                                 |
+| `outbound.filler_sentences`                                                    | list            |            | Short phrases the agent says while an action runs, so the customer doesn't hear dead air. Each entry has `waiting`, a list of strings.                                                                                                                                            |
+| `additional_configs`                                                           | block           |            | Container for `speak_up_config`, `endpointing_config`, and `beepboop_config`. A direct child of `modality voice`. See [Additional Configs](#additional-configs).                                                                                                                  |
+
+Include all three pronunciation properties (`grapheme`, `phoneme`, and `type`) in every pronunciation entry, and use uppercase `IPA` or `CMU` for the `type`. A missing `grapheme` or `phoneme` causes an error. A missing `type` silently drops the entry, so a successful compile doesn't prove the pronunciation was kept.
+
+:::note
+Earlier versions of Agent Script used flat voice keys: `voice_id`, `outbound_speed`, `outbound_style_exaggeration`, `outbound_stability`, `outbound_similarity`, `inbound_filler_words_detection`, `inbound_keywords`, `outbound_filler_sentences`, and `pronunciation_dict`. Don't combine these with the nested variables in the same `modality voice` block. A block that mixes both formats fails with `Both Voice schema versions were detected, use only one at a time.` See [Configure Voice Models](ascript-voice.md) for the full diagnostic.
+
+To migrate, replace each flat key with its nested path and delete the flat key. For example, `outbound_stability` becomes `outbound.model.parameters.stability`, and `outbound_similarity` becomes `outbound.model.parameters.similarity`. `outbound_style_exaggeration` has no nested replacement, so remove it. `additional_configs` is shared by both formats and doesn't cause the error.
+
+A 20-character ElevenLabs voice ID, like the one the flat `voice_id` key took, isn't a `persona_id`. Use an identifier from the Voice Catalog.
+:::
 
 ### Additional Configs
 
-The `additional_configs` block groups three sub-configurations that fine-tune turn-taking behavior on a live call.
+The `additional_configs` block fine-tunes turn-taking behavior on a live call.
 
-| Sub-config           | Variable                          | Type   | Range          | Description                                                                                                               |
-| :------------------- | :-------------------------------- | :----- | :------------- | :------------------------------------------------------------------------------------------------------------------------ |
-| `speak_up_config`    | `speak_up_first_wait_time_ms`     | number | 10000 – 300000 | How long to wait, in milliseconds, before speaking up for the first time after the customer goes silent.                  |
-| `speak_up_config`    | `speak_up_follow_up_wait_time_ms` | number | 10000 – 300000 | How long to wait, in milliseconds, before speaking up again if the customer is still silent.                              |
-| `speak_up_config`    | `speak_up_message`                | string | —              | The message the agent says when it speaks up.                                                                             |
-| `endpointing_config` | `max_wait_time_ms`                | number | 500 – 60000    | Maximum time, in milliseconds, to wait for the customer to continue speaking before treating the turn as complete.        |
-| `beepboop_config`    | `max_wait_time_ms`                | number | 500 – 60000    | Maximum time, in milliseconds, to wait when analyzing an inbound automated tone (like a fax machine or answering system). |
+| Path                                                                 | Type   | Range           | Description                                                                                                        |
+| :------------------------------------------------------------------- | :----- | :-------------- | :----------------------------------------------------------------------------------------------------------------- |
+| `additional_configs.speak_up_config.speak_up_first_wait_time_ms`     | number | 10000 to 300000 | How long to wait, in milliseconds, before speaking up the first time the customer goes silent.                     |
+| `additional_configs.speak_up_config.speak_up_follow_up_wait_time_ms` | number | 10000 to 300000 | How long to wait, in milliseconds, before speaking up again if the customer stays silent.                          |
+| `additional_configs.speak_up_config.speak_up_message`                | string |                 | The message the agent says when it speaks up.                                                                      |
+| `additional_configs.endpointing_config.max_wait_time_ms`             | number | 500 to 60000    | Maximum time, in milliseconds, to wait for the customer to continue speaking before treating the turn as complete. |
+| `additional_configs.beepboop_config.max_wait_time_ms`                | number | 500 to 60000    | Maximum time, in milliseconds, to wait when analyzing an inbound automated tone.                                   |
+
+These settings apply at the voice-session level. Place `additional_configs` directly under `modality voice`, not under either direction, `model.parameters`, or a per-language override. The session's `endpointing_config.max_wait_time_ms` and an ASR model's `endpointing` parameter are separate controls. Schema acceptance of a value doesn't establish that the ASR provider supports the same range.
 
 ### Full Example
 
+This English example uses Flash v2 and its compatible April persona. The parameter values illustrate explicit overrides. They aren't recommended defaults for every agent.
+
 ```sfdocs-code {"lang":"agentscript", "title": "Full Voice Modality"}
+language:
+    default_locale: "en_US"
+
 modality voice:
-    inbound_filler_words_detection: True
-    inbound_keywords:
+    language:
+        default_locale: "en_US"
+    inbound:
+        filler_words_detection: True
         keywords:
-            - "urgent"
-            - "emergency"
-    voice_id: "UgBBYS2sOqTuMpoF3BR0"
-    outbound_speed: 1.0
-    outbound_style_exaggeration: 0.5
-    pronunciation_dict:
-        - grapheme: "Eliquis"
-          phoneme: "ɛlɪkwɪs"
-          type: "IPA"
-    outbound_filler_sentences:
-        - waiting: ["Let me look into that...", "Give me a moment..."]
+            - "Agentforce"
+        model:
+            id: "nova-3"
+    outbound:
+        persona_id: "a029af9d692c"
+        model:
+            id: "eleven_flash_v2"
+            parameters:
+                speed: 0.7
+                stability: 0.5
+                similarity: 0.75
+        pronunciations:
+            - grapheme: "Agentforce"
+              phoneme: "EY1 JH AH0 N T F AO1 R S"
+              type: "CMU"
+            - grapheme: "Eliquis"
+              phoneme: "ɛlɪkwɪs"
+              type: "IPA"
+        filler_sentences:
+            - waiting: ["One moment please."]
     additional_configs:
         speak_up_config:
-            speak_up_first_wait_time_ms: 10000
+            speak_up_first_wait_time_ms: 20000
             speak_up_follow_up_wait_time_ms: 10000
             speak_up_message: "Are you still there?"
         endpointing_config:
-            max_wait_time_ms: 1000
+            max_wait_time_ms: 2000
         beepboop_config:
             max_wait_time_ms: 1000
 ```
@@ -299,7 +349,7 @@ These properties make up a subagent block:
 
 - **subagent name**: This value is the name of the subagent that should accurately describe the scope and purpose of this subagent in a few words. Because this value can’t have spaces, use `snake_case` to name the subagent.
 - **description**: This property contains the description for this subagent. This value should help the agent determine when to use this subagent based on the user’s intent.
-- **system.instructions** (optional): Override system-level system instructions for this subagent only. By overriding system-level instructions, you can avoid giving conflicting intructions to the LLM, which can cause unexpected agent behavior. You can also change the agent's voice & tone for a specific subagent. See [Avoid Conflicting Instructions with Instruction Overrides](./patterns/ascript-patterns-system-overrides.md).
+- **system.instructions** (optional): Override system-level system instructions for this subagent only. By overriding system-level instructions, you can avoid giving conflicting intructions to the LLM, which can cause unexpected agent behavior. You can also change the agent's voice & tone for a specific subagent. See [Avoid Conflicting Instructions with Instruction Overrides](patterns/ascript-patterns-system-overrides.md).
 - **reasoning**: This section contains information sent to the reasoning engine. Its primary properties are instructions and actions.
   - **reasoning.instructions**: This property contains guidance for the reasoning engine after it has decided that this subagent is relevant to the user's request. The reasoning instructions can be a combination of logic instructions and prompt-based instructions. See [Reasoning Instructions](reference/ascript-ref-instructions.md).
   - **reasoning.actions**: The list of tools that are applicable for the reasoning engine to use. This list can point to agent actions listed in the higher-level actions section, as well as other functionality available to the reasoning engine (such as transitioning to another subagent, or setting a variable's value). See [Tools (Reasoning Actions)](reference/ascript-ref-tools.md).
@@ -309,7 +359,7 @@ These properties make up a subagent block:
 
 Use the `connected_subagent` block to define a connection to another Agentforce agent in your Salesforce org. Connected subagents differ from [subagents](#subagent-blocks) that are part of your current agent. A connected subagent represents a complete, independent agent with its own distinct expertise and identity. A connected subagent can contain one or more subagents of its own. You can use a connected subagent in a [reasoning action](reference/ascript-ref-actions.md#using-actions) to delegate tasks to another Agentforce agent.
 
-For more information about using multiple agents in a Salesforce org, see [Multi-Agent Orchestration](https://help.salesforce.com/s/articleView?id=ai.agent_multi_orch.htm&type=5) and [Agent Script in Multi-Agent Solutions](https://help.salesforce.com/s/articleView?id=ai.agent_multi_orch_script.htm&type=5) in Salesforce Help.
+For more information about using multiple agents in a Salesforce org, see [Multi-Agent Orchestration](https://help.salesforce.com/s/articleView?id=ai.agent_multi_orch.htm\&type=5) and [Agent Script in Multi-Agent Solutions](https://help.salesforce.com/s/articleView?id=ai.agent_multi_orch_script.htm\&type=5) in Salesforce Help.
 
 ```sfdocs-code {"lang":"agentscript", "title": "Example - Define the CRM_Agent Connected Subagent"}
 connected_subagent CRM_Agent:
@@ -351,7 +401,7 @@ start_agent agent_router:
 These properties make up a `connected_subagent` block:
 
 - **connected_subagent name**: The name used to reference this connected subagent elsewhere in your Agent Script.
-- **target**: The URI identifying the Agentforce agent (also called the reference agent). This value is filled in when you [connect an agent as a subagent in Agentforce Builder](https://help.salesforce.com/s/articleView?id=ai.agent_multi_orch_connect.htm&type=5).
+- **target**: The URI identifying the Agentforce agent (also called the reference agent). This value is filled in when you [connect an agent as a subagent in Agentforce Builder](https://help.salesforce.com/s/articleView?id=ai.agent_multi_orch_connect.htm\&type=5).
 - **label** (optional): A human-readable label for the connected subagent.
 - **description** (required): Describes the connected subagent's capabilities or when it should be called. This description helps the reasoning engine decide when to delegate to the connected subagent.
 - **loading_text** (optional): A message shown to the customer while the connected subagent runs.
@@ -404,7 +454,7 @@ For more guidance on how to use the start agent block for subagent routing and f
 
 ## Related Topics
 
-- [Agent Script Patterns](./patterns/ascript-patterns.md)
+- [Agent Script Patterns](patterns/ascript-patterns.md)
 - [Agent Script Reference](reference/ascript-reference.md)
-- [Configure Models in Agent Script](./ascript-model.md)
-- [Configure Voice Models in Agent Script](./ascript-voice.md)
+- [Configure Models in Agent Script](ascript-model.md)
+- [Configure Voice Models in Agent Script](ascript-voice.md)

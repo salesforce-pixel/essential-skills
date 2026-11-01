@@ -8,7 +8,7 @@ A system variable is:
 - predefined, so you don't define it in the `variables` block
 - used in the same places as a custom variable or a linked variable
 
-For custom and linked variable definitions, see [Agent Script Reference: Variables (Custom and Linked)](./ascript-ref-variables.md).
+For custom and linked variable definitions, see [Agent Script Reference: Variables (Custom and Linked)](ascript-ref-variables.md).
 
 ## `user_input`
 
@@ -71,6 +71,31 @@ reasoning:
             with connection = @system_variables.current_connection
 ```
 
+## `last_reply`
+
+The `last_reply` system variable tells a voice agent when a caller cut the agent off (barged in), and what the caller heard.
+
+:::note
+`last_reply` is for voice agents only.
+:::
+
+| Variable                            | Type          | Description                                        |
+| ----------------------------------- | ------------- | -------------------------------------------------- |
+| `last_reply.interrupted`            | true or false | Whether the caller cut off the agent's last reply. |
+| `last_reply.interrupted_heard_text` | text or empty | The part of the reply the caller actually heard.   |
+
+Without this check, an agent can re-ask for details the caller already confirmed, or go off script, after a barge-in.
+
+### Example - Acknowledge an Interruption
+
+```sfdocs-code {"lang":"agentscript", "title": "Example: Respond to a barge-in"}
+# In reasoning.instructions (voice agents only)
+if @system_variables.last_reply.interrupted == True:
+    | The caller cut you off. They only heard:
+    | {!@system_variables.last_reply.interrupted_heard_text}
+    | Don't re-ask details they already confirmed.
+```
+
 ## `uploaded_files`
 
 The `uploaded_files` system variable is a list of `File` objects representing files that the customer uploaded. The agent stores the 10 most recently uploaded files for the duration of the session. If the customer hasn't uploaded any files, then `uploaded_files` is empty.
@@ -90,4 +115,4 @@ To use `@system_variables.uploaded_files`, enable file uploads in the [`file_upl
 
 ## Related Topics
 
-- Reference: [Variables (Custom and Linked)](./ascript-ref-variables.md)
+- Reference: [Variables (Custom and Linked)](ascript-ref-variables.md)

@@ -6,16 +6,17 @@ Use conditional transitions at the top of your instructions to force users throu
 
 ## Why Use This Pattern
 
-- Use [filtering](./ascript-patterns-filtering.md) (`available when`) when you want to remove options.
+- Use [filtering](ascript-patterns-filtering.md) (`available when`) when you want to remove options.
+
 - Use the required flow pattern (also described as a "conditional transition") when users must complete a step before anything else occurs.
 
-- Use [Enforce Required Workflows Through Subagents In Multi Turn Conversations](./ascript-patterns-multi-turn.md) to enforce step-by-step sequencing across conversation turns. This pattern ensures a required workflow through subagents, where the next subagent depends on a customer's response to a previous subagent.
+- Use [Enforce Required Workflows Through Subagents In Multi Turn Conversations](ascript-patterns-multi-turn.md) to enforce step-by-step sequencing across conversation turns. This pattern ensures a required workflow through subagents, where the next subagent depends on a customer's response to a previous subagent.
 
-| Approach                                                                                                     | When to Use                                                                                                   |
-| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| `available when`                                                                                             | Control which reasoning actions are available; LLM chooses among them                                         |
-| Conditional transition                                                                                       | Require users to complete a step; no LLM choice                                                               |
-| [Enforce Required Workflows Through Subagents In Multi Turn Conversations](./ascript-patterns-multi-turn.md) | Enforce step-by-step sequencing through subagents while handling multiple conversation turns in each subagent |
+| Approach                                                                                                                             | When to Use                                                                                                   |
+| ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `available when`                                                                                                                     | Control which reasoning actions are available; LLM chooses among them                                         |
+| Conditional transition                                                                                                               | Require users to complete a step; no LLM choice                                                               |
+| [Enforce Required Workflows Through Subagents In Multi Turn Conversations](ascript-patterns-multi-turn.md) | Enforce step-by-step sequencing through subagents while handling multiple conversation turns in each subagent |
 
 For critical flows like identity verification, a conditional transition in instructions is more reliable than `available when` filtering alone. While filtering restricts options, it doesn’t enforce workflows. For example, instead of prompting the user to verify their identity, the agent can exclusively choose options that don’t require user verification. A conditional transition guarantees the workflow before any reasoning takes place.
 
@@ -95,4 +96,4 @@ See [Agent Script Example: Use Step Variables to Enforce Subagent Workflows](../
 - Pattern: [Conditionals](ascript-patterns-conditionals.md)
 - Pattern: [Transitions](ascript-patterns-transitions.md)
 - Pattern: [Filtering with Available When](ascript-patterns-filtering.md)
-- _Trailhead_: [Agent Script Basics: Route and Gate Conversations with Agent Script](https://trailhead.salesforce.com/content/learn/modules/agent-script-basics)
+- *Trailhead*: [Agent Script Basics: Route and Gate Conversations with Agent Script](https://trailhead.salesforce.com/content/learn/modules/agent-script-basics)

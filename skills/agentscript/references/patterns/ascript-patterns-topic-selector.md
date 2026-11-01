@@ -55,15 +55,15 @@ actions:
 
 ## Subagent Gating
 
-You can gate and control flow using `available when` filters. See the [Filtering Pattern](./ascript-patterns-filtering.md) for examples.
+You can gate and control flow using `available when` filters. See the [Filtering Pattern](ascript-patterns-filtering.md) for examples.
 
 ## Deterministic Routing
 
-For critical routing decisions, use conditional transitions in instructions instead of relying on the LLM to choose the right flow. See the [Required Subagent Workflow Pattern](./ascript-patterns-required-flow.md) for examples.
+For critical routing decisions, use conditional transitions in instructions instead of relying on the LLM to choose the right flow. See the [Required Subagent Workflow Pattern](ascript-patterns-required-flow.md) for examples.
 
 ## Effective Transitions
 
-For more on how to effectively transition to another subagent, see the [Transitions Pattern](./ascript-patterns-transitions.md).
+For more on how to effectively transition to another subagent, see the [Transitions Pattern](ascript-patterns-transitions.md).
 
 ## Changing the Start Subagent
 
@@ -88,4 +88,4 @@ However, you can define another subagent as the starting subagent instead (in Ag
 - Pattern: [Transitions](ascript-patterns-transitions.md)
 - Reference: [Start Agent Block](../ascript-blocks.md#start-agent-block)
 - Reference: [Flow of Control](../ascript-flow.md)
-- _Trailhead_: [Agent Script Basics: Route and Gate Conversations with Agent Script](https://trailhead.salesforce.com/content/learn/modules/agent-script-basics)
+- *Trailhead*: [Agent Script Basics: Route and Gate Conversations with Agent Script](https://trailhead.salesforce.com/content/learn/modules/agent-script-basics)
