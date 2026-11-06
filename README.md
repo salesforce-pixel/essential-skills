@@ -9,13 +9,20 @@ A *skill* is a folder containing a `SKILL.md` (instructions + metadata) and any 
 | Skill | What it does |
 |-------|--------------|
 | [`afagent-metadata-helper`](skills/afagent-metadata-helper) | Retrieves, deploys, and versions **Agentforce agents** as metadata. Picks between the v68 types (`AiAgentDefinition` / `AiAgentDefinitionVersion`) and the v67-and-earlier types (`Bot`, `BotVersion`, `GenAiPlannerBundle`, `AiAuthoringBundle`), resolves version naming, builds `package.xml` manifests, and separates **draft** deploys from **publish** (which commits a permanent version). Includes verified workarounds for CLI/doc gaps and known retrieve/deploy errors. |
+| [`agentforce-conversation-client`](skills/agentforce-conversation-client) | Embeds the **Agentforce Conversation Client** (Employee Agent chat UI) in external web apps via the `@salesforce/agentforce-conversation-client` Web SDK, or drives the native Agentforce side panel from an LWC via `lightning/accApi` (incl. opening Agentforce Coworker). Covers External Client App OAuth, trusted domains, token + frontdoor URL, agent ID lookup, rendering modes and style tokens. |
+| [`agentforce-platform-tracing-stdm`](skills/agentforce-platform-tracing-stdm) | Data 360 SQL over the **Agentforce Session Trace Data Model** (`ssot__AiAgent*` DMOs + Agent Analytics tag/moment DMOs): list sessions, read transcripts, trace topic routing / actions / LLM calls per turn, find failing or slow steps, measure latency and token usage, count metered actions and Flex Credits. |
 | [`agentscript`](skills/agentscript) | Authoritative Salesforce Agent Script (AgentScript) language reference — syntax, blocks, flow of control, model configuration, voice/modality configuration, patterns, complete example agents, and agent metadata/package.xml deployment reference (API v68 and v67-earlier). Grounds any `.agent` file you write or review against correct syntax instead of relying on memory. |
+| [`building-data360-semantic-queries`](skills/building-data360-semantic-queries) | Builds and debugs **Data 360 semantic search SQL** — `vector_search()` / `hybrid_search()` — including the index → chunk → source join chain, join-key discovery, pre-filtering, fusion ranking (RRF/LFR/DFR), autodrop, and running it from Apex (`sfsqlquery`, `ConnectApi.CdpQuery`) as a prompt-template data provider. |
+| [`calling-prompt-templates-apex`](skills/calling-prompt-templates-apex) | Calls **Prompt Templates from Apex** with `ConnectApi.EinsteinLLM.generateMessagesForPromptTemplate` — from `@AuraEnabled` controllers, `@InvocableMethod`s for Flow, or services — with ready-to-deploy service/controller/invocable/test classes. |
 | [`crafting-demo-data`](skills/crafting-demo-data) | Populates and refreshes Salesforce **demo** orgs with realistic, story-coherent data. CREATE new narrative-coherent records (schema-first, dependency-ordered, idempotent via External ID + upsert) or REFRESH stale data in place (roll close dates forward, re-time activities). Org-safety check refuses to write to production; every created record is tagged for clean teardown. |
 | [`fetching-salesforce-docs`](skills/fetching-salesforce-docs) | Reliably retrieves official Salesforce documentation (developer.salesforce.com, help.salesforce.com, architect/admin, Lightning Design System), including JS-heavy and shell-rendered pages, via a browser-rendered extractor. Self-provisions an isolated Python + Playwright runtime on first use. |
+| [`generating-prompt-template`](skills/generating-prompt-template) | Authors and validates **`GenAiPromptTemplate`** metadata (Flex, Sales Email, Field Generation, Record Summary, Case Email) as deployable `.genAiPromptTemplate-meta.xml`: inputs, Apex/Flow data providers, merge expressions, models, versioning and `package.xml`. |
+| [`hxl-widget-builder`](skills/hxl-widget-builder) | Builds **Headless Experience Layer (HXL)** widgets end to end — `UiWidgetBundle` composition/schema, custom Lightning types and renderers, the Apex invocable behind them, and the `McpServerDefinition` wiring that renders them in Claude, ChatGPT and Slackbot. Ships a validator and deployable templates. |
+| [`sf-multiframework-development`](skills/sf-multiframework-development) | Builds, runs, deploys and packages **Salesforce Multi-Framework apps** — React/Angular SPAs deployed as `UIBundle` metadata — with the Data SDK (GraphQL query/mutate, cache control, extensions, i18n), styling, ACC embedding, testing and 2GP packaging, plus microfrontend embedding. |
 
 ## Install as a Claude Code plugin (recommended)
 
-This repo is also a Claude Code plugin marketplace. Installing the `essential-skills` plugin adds **all four skills** at once, works the same on macOS, Windows, and Linux, and can be updated later with one command — no zips, hidden folders, or copying.
+This repo is also a Claude Code plugin marketplace. Installing the `essential-skills` plugin adds **every skill** in the table above at once, works the same on macOS, Windows, and Linux, and can be updated later with one command — no zips, hidden folders, or copying.
 
 Inside Claude Code, run:
 
@@ -67,7 +74,7 @@ curl -fsSL https://github.com/salesforce-pixel/essential-skills/archive/refs/hea
   | tar -xz --strip-components=2 -C ~/.claude/skills essential-skills-main/skills/agentscript
 ```
 
-> Replace `agentscript` with any other skill folder name from the table above (e.g. `afagent-metadata-helper`, `crafting-demo-data`, `fetching-salesforce-docs`).
+> Replace `agentscript` with any other skill folder name from the table above (e.g. `hxl-widget-builder`, `crafting-demo-data`, `fetching-salesforce-docs`).
 
 Both one-liners are safe to re-run any time to update: they never touch other skills already in `~/.claude/skills/`, and they overwrite every file the new version ships with the latest content from `main`. The one thing plain `tar` extraction *doesn't* do is delete files a newer version removed — if a skill's file layout changes, a stale leftover file could remain alongside the new one. For a guaranteed byte-for-byte clean overwrite, use the `rsync --delete` option below instead.
 
@@ -138,13 +145,37 @@ Once installed, Claude Code auto-discovers the skill and triggers it when your r
 
 Requirements are per-skill — see each skill's own `README.md` / `SKILL.md`. As a general note, skills that ship Python scripts (like `fetching-salesforce-docs`) provision their own isolated runtime under `~/.claude/` on first run and need `python3` plus internet access for that one-time setup; they do **not** touch your system or project Python.
 
+## Keeping skills current (doc refresh)
+
+Skills built from Salesforce documentation are refreshed against the live doc site by
+[`tools/doc-refresh/`](tools/doc-refresh):
+
+- **`sources.json`** lists every tracked skill and where its docs come from — a product
+  `llms.txt` index (e.g. `https://developer.salesforce.com/docs/llms-genai.txt`) plus a
+  page-name pattern, and/or explicit page URLs.
+- **`refresh.py`** copy-replaces (no diffing). *Mirror* skills (`agentscript`) get their
+  reference pages overwritten and their version bumped. *Curated* skills (hand-written
+  `SKILL.md`) get raw source snapshots under `tools/doc-refresh/snapshots/<skill>/`, so
+  `git diff` shows exactly what changed upstream.
+- **`/refresh-skills`** (a project skill in `.claude/skills/`) is the fixed routine: pull,
+  refresh, review snapshot changes and update affected skills, run `check.py`, commit and
+  push to `main`. Open Claude Code in this repo and type `/refresh-skills`, or ask it to
+  refresh the skills.
+- **`tools/doc-refresh/run.sh`** runs that routine headless (`claude -p`).
+  `install-schedule.sh` registers a macOS launchd job that runs it every other Sunday
+  morning.
+
+To track a new skill, add an entry to `sources.json` and run
+`python3 tools/doc-refresh/refresh.py --skill <name>` once to create its baseline.
+
 ## Contributing a new skill
 
 1. Create a new folder under `skills/<your-skill-name>/`.
 2. Add a `SKILL.md` with YAML frontmatter (`name`, `description`, and a `metadata.version`).
 3. Keep scripts and assets inside that folder so the skill stays self-contained and portable (no hardcoded absolute paths).
 4. Add the skill to the **Available skills** table above.
-5. Open a PR.
+5. If it's built from Salesforce docs, add its sources to `tools/doc-refresh/sources.json`.
+6. Open a PR.
 
 ## License
 

@@ -1,0 +1,5 @@
+{
+  "title": "Account Health",
+  "description": "Structured account health returned by the Get Account Health action",
+  "lightning:type": "@apexClassType/c__AccountHealthService$AccountHealth"
+}

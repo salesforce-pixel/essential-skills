@@ -1,0 +1,21 @@
+{
+  "renderer": {
+    "componentOverrides": {
+      "$": {
+        "definition": "@widget/c/accountHealthCard",
+        "attributes": {
+          "accountName": "{!$attrs.outputValues.accountHealth.accountName}",
+          "industry": "{!$attrs.outputValues.accountHealth.industry}",
+          "annualRevenueLabel": "{!$attrs.outputValues.accountHealth.annualRevenueLabel}",
+          "openCaseCount": "{!$attrs.outputValues.accountHealth.openCaseCount}",
+          "isAtRisk": "{!$attrs.outputValues.accountHealth.isAtRisk}",
+          "statusLabel": "{!$attrs.outputValues.accountHealth.statusLabel}",
+          "statusVariant": "{!$attrs.outputValues.accountHealth.statusVariant}",
+          "riskReason": "{!$attrs.outputValues.accountHealth.riskReason}",
+          "recordUrl": "{!$attrs.outputValues.accountHealth.recordUrl}",
+          "openOpportunities": "{!$attrs.outputValues.accountHealth.openOpportunities}"
+        }
+      }
+    }
+  }
+}

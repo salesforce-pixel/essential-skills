@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>AccountHealthService</members>
+        <members>AccountHealthServiceTest</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>accountHealthCard</members>
+        <name>UiWidgetBundle</name>
+    </types>
+    <types>
+        <!-- Scenario B (Agentforce) -->
+        <members>accountHealth</members>
+        <!-- Scenario C (MCP): payload + result wrapper -->
+        <members>accountHealthOutputValues</members>
+        <members>accountHealthResult</members>
+        <name>LightningTypeBundle</name>
+    </types>
+    <version>67.0</version>
+</Package>

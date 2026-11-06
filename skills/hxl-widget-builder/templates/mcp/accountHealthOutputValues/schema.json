@@ -1,0 +1,14 @@
+{
+  "title": "Account Health Output Values",
+  "description": "Payload fields from the Get Account Health invocable action",
+  "type": "object",
+  "lightning:type": "lightning__objectType",
+  "lightning:tags": ["mcp"],
+  "unevaluatedProperties": false,
+  "properties": {
+    "accountHealth": {
+      "title": "Account Health",
+      "lightning:type": "@apexClassType/c__AccountHealthService$AccountHealth"
+    }
+  }
+}

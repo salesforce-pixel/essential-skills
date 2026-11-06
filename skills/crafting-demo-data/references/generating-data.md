@@ -93,7 +93,7 @@ sf sobject describe --sobject Account --target-org <alias> --json \
   | jq -r '.result.fields[] | select(.externalId==true) | .name'
 ```
 - **Exists** → use it as the upsert key.
-- **Doesn't exist** → create one (a Text field with `externalId=true`, `unique=true`), then deploy it **before** loading data. Hand off to [generating-custom-field](../generating-custom-field/SKILL.md) + [deploying-metadata](../deploying-metadata/SKILL.md). One field per object you intend to upsert. Note this is a **metadata change**: it needs deploy/customize-app permission, and some SEs won't want demo prep altering the org's schema — confirm before creating fields.
+- **Doesn't exist** → create one (a Text field with `externalId=true`, `unique=true`), then deploy it **before** loading data. Hand off to [generating-custom-field](../../generating-custom-field/SKILL.md) + [deploying-metadata](../../deploying-metadata/SKILL.md). One field per object you intend to upsert. Note this is a **metadata change**: it needs deploy/customize-app permission, and some SEs won't want demo prep altering the org's schema — confirm before creating fields.
 - **Can't / shouldn't add a field** (read-only metadata, locked org) → fall back to the description-prefix tag below and accept that CREATE is not idempotent (query-before-insert and dedupe if you must re-run).
 
 Upsert once the key field exists:

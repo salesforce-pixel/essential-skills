@@ -1,0 +1,65 @@
+{
+  "title": "Account Health Card",
+  "description": "Account health summary with open opportunities",
+  "type": "object",
+  "properties": {
+    "attributes": {
+      "lightning:type": "lightning__objectType",
+      "properties": {
+        "accountName": {
+          "title": "Account",
+          "description": "Account name",
+          "lightning:type": "lightning__textType"
+        },
+        "industry": {
+          "title": "Industry",
+          "description": "Account industry",
+          "lightning:type": "lightning__textType"
+        },
+        "annualRevenueLabel": {
+          "title": "Annual Revenue",
+          "description": "Formatted annual revenue, e.g. USD 25M (formatted in Apex)",
+          "lightning:type": "lightning__textType"
+        },
+        "openCaseCount": {
+          "title": "Open Cases",
+          "description": "Number of open cases",
+          "lightning:type": "lightning__numberType"
+        },
+        "isAtRisk": {
+          "title": "At Risk",
+          "description": "True when the account needs attention",
+          "lightning:type": "lightning__booleanType"
+        },
+        "statusLabel": {
+          "title": "Status",
+          "description": "'At risk' or 'Healthy' (computed in Apex)",
+          "lightning:type": "lightning__textType"
+        },
+        "statusVariant": {
+          "title": "Status Variant",
+          "description": "tile/badge variant for the status (computed in Apex)",
+          "lightning:type": "lightning__textType"
+        },
+        "riskReason": {
+          "title": "Risk Reason",
+          "description": "Why the account is flagged",
+          "lightning:type": "lightning__textType"
+        },
+        "recordUrl": {
+          "title": "Record URL",
+          "description": "Link to the account in Salesforce",
+          "lightning:type": "lightning__urlType"
+        },
+        "openOpportunities": {
+          "title": "Open Opportunities",
+          "description": "Open opportunities on the account",
+          "lightning:type": "lightning__listType",
+          "items": {
+            "lightning:type": "@apexClassType/c__AccountHealthService$Opp"
+          }
+        }
+      }
+    }
+  }
+}
