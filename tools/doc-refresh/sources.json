@@ -1,0 +1,134 @@
+{
+  "_comment": [
+    "kind=mirror : the skill's reference pages ARE the docs. refresh.py copy-replaces them into the skill and bumps the version.",
+    "kind=curated: SKILL.md is hand-written FROM the docs. refresh.py copy-replaces raw source snapshots into tools/doc-refresh/snapshots/<skill>/;",
+    "              the /refresh-skills routine reviews the snapshot git diff and updates the skill by hand.",
+    "sources[].index + match : every page in that llms.txt whose path after /docs/ (minus .md) matches the regex.",
+    "sources[].urls          : explicit pages. *.md pages are fetched directly; anything else (atlas, help.salesforce.com)",
+    "                          goes through skills/fetching-salesforce-docs/scripts/extract_salesforce_doc.py (plain text)."
+  ],
+  "skills": {
+    "agentscript": {
+      "kind": "mirror",
+      "skill_dir": "skills/agentscript",
+      "dest": "references",
+      "index": "https://developer.salesforce.com/docs/llms-genai.txt",
+      "site_root": "https://developer.salesforce.com",
+      "guide_path": "/docs/ai/agentforce/guide/",
+      "discover": "^(agent-script|ascript-[a-z0-9-]+)$",
+      "pinned": [
+        "agent-examples",
+        "apex-examples-custom-action",
+        "headless-example-org-build",
+        "agent-dx-deploy-metadata",
+        "agent-dx-api-v67-earlier",
+        "package-allagents67",
+        "package-singleagent67",
+        "package-single-mismatch67",
+        "string-replace-example"
+      ],
+      "layout": [
+        { "match": "^ascript-patterns", "dir": "patterns" },
+        { "match": "^ascript-ref(-|erence$)", "dir": "reference" },
+        { "match": "^(ascript-examples?-|ascript-lead-gather$|agent-examples$|apex-examples-|headless-example-)", "dir": "examples" },
+        { "match": "^(agent-dx-|package-|string-replace-example$)", "dir": "deploy-metadata" },
+        { "match": ".*", "dir": "" }
+      ],
+      "image_placeholder": "> *[Image removed — see online documentation]*"
+    },
+
+    "afagent-metadata-helper": {
+      "kind": "curated",
+      "skill_dir": "skills/afagent-metadata-helper",
+      "sources": [
+        { "urls": [
+          "https://developer.salesforce.com/docs/ai/agentforce/guide/agent-dx-deploy-metadata.md",
+          "https://developer.salesforce.com/docs/ai/agentforce/guide/agent-dx-api-v67-earlier.md",
+          "https://developer.salesforce.com/docs/ai/agentforce/guide/agent-dx-retrieve-deploy.md",
+          "https://developer.salesforce.com/docs/ai/agentforce/guide/agent-dx-nga-publish.md",
+          "https://developer.salesforce.com/docs/ai/agentforce/guide/agent-dx-synch.md",
+          "https://developer.salesforce.com/docs/ai/agentforce/guide/error-ref-ai-metadata-service.md",
+          "https://developer.salesforce.com/docs/ai/agentforce/references/agents-metadata-tooling/agents-metadata.md",
+          "https://developer.salesforce.com/docs/ai/agentforce/references/agents-metadata-tooling/agents-metadatav67.md"
+        ] }
+      ]
+    },
+
+    "agentforce-conversation-client": {
+      "kind": "curated",
+      "skill_dir": "skills/agentforce-conversation-client",
+      "sources": [
+        { "index": "https://developer.salesforce.com/docs/llms-agentforce-conversation-client.txt", "match": "^platform/accsdk/" },
+        { "urls": [
+          "https://help.salesforce.com/s/articleView?id=platform.lightning_out_auth.htm&type=5",
+          "https://help.salesforce.com/s/articleView?id=xcloud.frontdoor_singleaccess.htm&type=5"
+        ] }
+      ]
+    },
+
+    "hxl-widget-builder": {
+      "kind": "curated",
+      "skill_dir": "skills/hxl-widget-builder",
+      "sources": [
+        { "index": "https://developer.salesforce.com/docs/llms-headless-experience-layer.txt", "match": "^platform/hxl/" }
+      ]
+    },
+
+    "sf-multiframework-development": {
+      "kind": "curated",
+      "skill_dir": "skills/sf-multiframework-development",
+      "sources": [
+        { "index": "https://developer.salesforce.com/docs/llms-multi-framework.txt", "match": "^platform/(multiframework|microfrontend)/" }
+      ]
+    },
+
+    "building-data360-semantic-queries": {
+      "kind": "curated",
+      "skill_dir": "skills/building-data360-semantic-queries",
+      "sources": [
+        { "urls": [
+          "https://developer.salesforce.com/docs/data/data-cloud-query-guide/guide/dc-apex-query.md",
+          "https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_namespace_sfsqlquery.htm",
+          "https://help.salesforce.com/s/articleView?id=data.c360_a_hybridsearch_autodrop_best_practices.htm&type=5",
+          "https://help.salesforce.com/s/articleView?id=data.c360_a_search_index_chunk_dmo.htm&type=5",
+          "https://help.salesforce.com/s/articleView?id=data.c360_a_search_index_enriched_index.htm&type=5",
+          "https://help.salesforce.com/s/articleView?id=data.c360_a_search_index_index_dmo.htm&type=5",
+          "https://help.salesforce.com/s/articleView?id=data.c360_a_search_index_max_token_setting.htm&type=5",
+          "https://help.salesforce.com/s/articleView?id=data.c360_a_search_index_supported_chunking_strategies.htm&type=5"
+        ] }
+      ]
+    },
+
+    "agentforce-platform-tracing-stdm": {
+      "kind": "curated",
+      "skill_dir": "skills/agentforce-platform-tracing-stdm",
+      "sources": [
+        { "index": "https://developer.salesforce.com/docs/llms-data-cloud.txt",
+          "match": "^data/data-cloud-dmo-mapping/guide/c360dm-(si-(aiagent|genaigateway)[a-z]+-dmo|aiagent[a-z]+_dmo_mappings)$" }
+      ]
+    },
+
+    "calling-prompt-templates-apex": {
+      "kind": "curated",
+      "skill_dir": "skills/calling-prompt-templates-apex",
+      "sources": [
+        { "urls": [
+          "https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_ConnectAPI_EinsteinLLM_static_methods.htm",
+          "https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_connectapi_input_einstein_llm_additional_config.htm",
+          "https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_connectapi_input_einstein_prompt_template_generations.htm",
+          "https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_connectapi_output_einstein_prompt_template_generations.htm"
+        ] }
+      ]
+    },
+
+    "generating-prompt-template": {
+      "kind": "curated",
+      "skill_dir": "skills/generating-prompt-template",
+      "sources": [
+        { "urls": [
+          "https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_genaiprompttemplate.htm"
+        ] }
+      ]
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit(skills/**)",
+      "Edit(tools/doc-refresh/**)",
+      "Edit(README.md)",
+      "Bash(test -f tools/doc-refresh/sources.json)",
+      "Bash(git status *)",
+      "Bash(git switch main)",
+      "Bash(git pull --ff-only)",
+      "Bash(git pull --rebase)",
+      "Bash(git diff *)",
+      "Bash(git ls-tree *)",
+      "Bash(git log *)",
+      "Bash(git add skills tools/doc-refresh README.md)",
+      "Bash(git commit -F tools/doc-refresh/.out/commit.txt)",
+      "Bash(git push origin main)",
+      "Bash(python3 -I tools/doc-refresh/refresh.py *)",
+      "Bash(python3 -I tools/doc-refresh/check.py)"
+    ],
+    "deny": [
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git push --force-with-lease *)",
+      "Bash(git reset --hard *)"
+    ]
+  }
+}

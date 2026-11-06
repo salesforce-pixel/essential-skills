@@ -12,3 +12,6 @@ venv/
 .idea/
 .vscode/
 *.swp
+
+# doc-refresh run output and logs
+tools/doc-refresh/.out/
