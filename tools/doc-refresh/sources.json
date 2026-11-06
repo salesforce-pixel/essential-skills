@@ -121,6 +121,36 @@
       ]
     },
 
+    "clt-agentforce-actions": {
+      "kind": "curated",
+      "skill_dir": "skills/clt-agentforce-actions",
+      "_note": "Item 18 was given as the GitHub tree URL https://github.com/forcedotcom/sf-skills/tree/main/skills/platform-custom-lightning-type-generate (HTML); its files are tracked as raw markdown.",
+      "sources": [
+        { "urls": [
+          "https://developer.salesforce.com/docs/ai/agentforce/guide/lightning-types.md",
+          "https://developer.salesforce.com/docs/ai/agentforce/guide/lightning-types-get-started.md",
+          "https://developer.salesforce.com/docs/ai/agentforce/guide/lightning-types-standard.md",
+          "https://developer.salesforce.com/docs/ai/agentforce/guide/lightning-types-example-full-editor-renderer.md",
+          "https://developer.salesforce.com/docs/ai/agentforce/guide/lightning-types-example-collection-renderer.md",
+          "https://developer.salesforce.com/docs/ai/agentforce/guide/global-copy.md",
+          "https://developer.salesforce.com/docs/ai/agentforce/guide/citations.md",
+          "https://developer.salesforce.com/docs/platform/lightning-types/guide/lightning-types.md",
+          "https://developer.salesforce.com/docs/platform/lightning-types/guide/lightning-types-core.md",
+          "https://developer.salesforce.com/docs/platform/lightning-types/guide/lightning-types-apex.md",
+          "https://developer.salesforce.com/docs/platform/lightning-types/guide/lightning-types-object.md",
+          "https://developer.salesforce.com/docs/platform/lightning-types/guide/lightning-types-custom-editor.md",
+          "https://developer.salesforce.com/docs/platform/lightning-types/guide/lightning-types-custom-renderer.md",
+          "https://developer.salesforce.com/docs/platform/lightning-types/guide/lightning-types-custom-collection-renderer.md",
+          "https://developer.salesforce.com/docs/platform/lightning-types/guide/lightning-types-custom-editor-property.md",
+          "https://developer.salesforce.com/docs/platform/lightning-types/guide/lightning-types-setup.md",
+          "https://developer.salesforce.com/docs/platform/api-metadata/references/meta-types/metadata-lightningtypebundle.md",
+          "https://raw.githubusercontent.com/forcedotcom/sf-skills/main/skills/platform-custom-lightning-type-generate/SKILL.md",
+          "https://raw.githubusercontent.com/forcedotcom/sf-skills/main/skills/platform-custom-lightning-type-generate/assets/primitive-types-and-constraints.md",
+          "https://raw.githubusercontent.com/forcedotcom/sf-skills/main/skills/platform-custom-lightning-type-generate/references/widget-rendition.md"
+        ] }
+      ]
+    },
+
     "generating-prompt-template": {
       "kind": "curated",
       "skill_dir": "skills/generating-prompt-template",

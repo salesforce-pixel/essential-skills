@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>AvailableFlight</members>
+        <members>Flight</members>
+        <members>FlightAgent</members>
+        <members>FlightAgentTest</members>
+        <members>FlightRequestFilter</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>flightDetails</members>
+        <members>flightRequestFilter</members>
+        <name>LightningComponentBundle</name>
+    </types>
+    <types>
+        <members>flightFilter</members>
+        <members>flightResponse</members>
+        <name>LightningTypeBundle</name>
+    </types>
+    <version>64.0</version>
+</Package>

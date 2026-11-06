@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "essential-skills",
-      "description": "Salesforce & Agentforce skills: Agent Script reference, agent metadata retrieve/deploy, Conversation Client, HXL widgets, Multi-Framework apps, Data 360 semantic search and session-trace SQL, Prompt Templates (metadata + Apex), demo data, and official docs retrieval.",
+      "description": "Salesforce & Agentforce skills: Agent Script reference, agent metadata retrieve/deploy, Conversation Client, HXL widgets, Multi-Framework apps, Data 360 semantic search and session-trace SQL, Prompt Templates (metadata + Apex), Custom Lightning Types for agent action UI, demo data, and official docs retrieval.",
       "source": "./",
       "strict": false,
       "category": "development",
@@ -19,6 +19,7 @@
         "demo-data",
         "documentation",
         "hxl",
+        "lightning-types",
         "metadata",
         "multiframework",
         "prompt-templates",

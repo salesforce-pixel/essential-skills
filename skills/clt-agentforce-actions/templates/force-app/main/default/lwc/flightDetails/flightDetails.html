@@ -1,0 +1,32 @@
+<template>
+  <lightning-card title="Available Flights" icon-name="standard:flight">
+    <div class="slds-p-horizontal_small">
+      <template lwc:if={hasFlights}>
+        <template for:each={flightData} for:item="flight">
+          <div key={flight.flightId} class="flight-card slds-box slds-box_x-small slds-m-bottom_small">
+            <div class="slds-grid slds-grid_align-spread">
+              <h2 class="slds-text-heading_small">{flight.flightId}</h2>
+              <span class="discount-tag">{flight.discountPercentage}% Off</span>
+            </div>
+            <div class="slds-grid slds-grid_align-spread slds-m-top_x-small">
+              <strong>${flight.price}</strong>
+              <span>{flight.durationInHr}</span>
+            </div>
+            <div class="slds-text-body_small slds-m-top_x-small">
+              Departure {flight.departureTime} · Arrival {flight.arrivalInHr}
+            </div>
+            <div class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">
+              <lightning-icon icon-name="utility:loop" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+              Layovers: {flight.numLayovers}
+              <lightning-icon icon-name="utility:animal_and_nature" size="xx-small" class="slds-m-horizontal_xx-small"></lightning-icon>
+              Pets allowed: {flight.petAllowedStatus}
+            </div>
+          </div>
+        </template>
+      </template>
+      <template lwc:else>
+        <p class="slds-text-color_weak">No flights found.</p>
+      </template>
+    </div>
+  </lightning-card>
+</template>
