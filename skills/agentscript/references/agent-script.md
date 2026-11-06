@@ -6,7 +6,7 @@ Get to know the language for building agents in Agentforce Builder. Use Agent Sc
 Beginning in April 2026, agent **topics** are now called **subagents**. There are no changes to functionality. During this transition, you may see a mix of the new and previous terms in our documentation
 :::
 
-To get hands-on with Agent Script, [Create an Agent](https://help.salesforce.com/s/articleView?id=ai.agent_setup_create.htm&type=5), then select **Script** from the view picker. Or, author an agent with [Agentforce DX](../agent-dx/agent-dx-nga-author-agent.md).
+To get hands-on with Agent Script, [Create an Agent](https://help.salesforce.com/s/articleView?id=ai.agent_setup_create.htm\&type=5), then select **Script** from the mode picker. Or, author an agent with [Agentforce DX](https://developer.salesforce.com/docs/ai/agentforce/guide/agent-dx-nga-author-agent.md).
 
 > *[Image removed — see online documentation]*
 
@@ -16,11 +16,11 @@ Agent Script is the language for building agents in Agentforce Builder. Script c
 
 Agentforce Builder gives you several ways to write Agent Script.
 
-- You can chat with Agentforce and explain what you want your agent to be able to do (for example, "If the order total is over \$100, then offer free shipping."). Agentforce converts your request into subagents, actions, instructions, and other expressions.
+- You can chat with Agentforce and explain what you want your agent to be able to do (for example, "If the order total is over $100, then offer free shipping."). Agentforce converts your request into subagents, actions, instructions, and other expressions.
 - In Canvas view, Agent Script is summarized into easily understandable blocks, which you can expand to view the underlying script. You can edit your agent with the help of quick action shortcuts. Type `/` to add expressions for common patterns (for example, if/else conditionals) and `@` to add resources (subagents, actions, and variables).
 - Advanced users can switch to Script view to write and edit script directly, with developer-friendly aids like syntax highlighting, autocompletion, and validation.
 
-Developers can also use Agentforce DX to generate or retrieve a script file into their local Salesforce DX project and then work with it in Visual Studio Code. The Agentforce DX VS Code Extension fully supports the Agent Script language with standard code editing features. See [Agentforce DX](../agent-dx/agent-dx.md) for more details.
+Developers can also use Agentforce DX to generate or retrieve a script file into their local Salesforce DX project and then work with it in Visual Studio Code. The Agentforce DX VS Code Extension fully supports the Agent Script language with standard code editing features. See [Agentforce DX](https://developer.salesforce.com/docs/ai/agentforce/guide/agent-dx.md) for more details.
 
 ## What Can You Do with Agent Script?
 
@@ -73,7 +73,7 @@ Among other compelling features, you can see in the above reasoning instructions
 
 Want to build Agent Script agents using an agent skill or with Agentforce Vibes? Check out these resources!
 
-- [Skills in Agentforce Vibes](https://developer.salesforce.com/docs/platform/einstein-for-devs/guide/skills.html) — A page describing how skills are used with Agentforce Vibes.
+- [Skills in Agentforce Vibes](https://developer.salesforce.com/docs/platform/einstein-for-devs/guide/skills.md) — A page describing how skills are used with Agentforce Vibes.
 - [Salesforce Skills Library](https://github.com/forcedotcom/afv-library) — A curated collection of Salesforce agent skills for building applications using any AI tool that supports skills.
 - [Agentforce Development Skill](https://github.com/forcedotcom/afv-library/tree/main/skills/developing-agentforce) — The specific skill (located within the Agentforce Vibes Library) designed for building, modifying, debugging, and deploying Agentforce agents using Agent Script.
 
@@ -83,15 +83,15 @@ To learn how to build agents in Canvas view or by chatting with Agentforce, see 
 
 To learn more about Agent Script, review these topics.
 
-- [Language Characteristics](./ascript-lang.md)
-- [Agent Script Blocks](./ascript-blocks.md)
-- [Flow of Control](./ascript-flow.md)
-- [Agent Script Patterns](./patterns/ascript-patterns.md)
-- [Agent Script Examples](./ascript-examples.md)
+- [Language Characteristics](ascript-lang.md)
+- [Agent Script Blocks](ascript-blocks.md)
+- [Flow of Control](ascript-flow.md)
+- [Agent Script Patterns](patterns/ascript-patterns.md)
+- [Agent Script Examples](ascript-examples.md)
 - [Agent Script Reference](reference/ascript-reference.md)
 
 ## See Also
 
-- [Manage Agent Script Agents](./ascript-manage.md)
-- _Trailhead_: [Programmatic Instructions in Agentforce](https://trailhead.salesforce.com/content/learn/modules/programmatic-instructions-in-agentforce)
-- _Trailhead_: [Agent Script Basics](https://trailhead.salesforce.com/content/learn/modules/agent-script-basics)
+- [Manage Agent Script Agents](ascript-manage.md)
+- *Trailhead*: [Programmatic Instructions in Agentforce](https://trailhead.salesforce.com/content/learn/modules/programmatic-instructions-in-agentforce)
+- *Trailhead*: [Agent Script Basics](https://trailhead.salesforce.com/content/learn/modules/agent-script-basics)

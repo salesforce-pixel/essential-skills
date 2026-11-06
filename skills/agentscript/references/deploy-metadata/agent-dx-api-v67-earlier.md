@@ -2,19 +2,19 @@
 
 Create a manifest to define the metadata you want to retrieve. You can copy and edit the default manifest that was created in your project at `manifest/package.xml`.
 
-## Understand Agent and Legacy Agent Metadata
+## Understand Agent and Legacy Agent Metadata (v67 and Earlier)
 
 - Draft (uncommitted) agents and agent versions are represented by `AiAuthoringBundle`, **not** `Bot` or `BotVersion`. You **can** edit a draft agent.
 - Committed agents and agent versions are represented by `AiAuthoringBundle`, plus `Bot` and `BotVersion`. You **can't** edit a committed agent. Instead, create and edit a new version.
 - Legacy agents don't have a commit stage, and are represented by `Bot` and `BotVersion` (not `AiAuthoringBundle`). You can edit and overwrite an active legacy agent.
 
-| Agent Type      | Metadata Representation                  | Editable |
-| :-------------- | :--------------------------------------- | :------- |
-| Draft Agent     | `AiAuthoringBundle`                      | Yes      |
-| Committed Agent | `AiAuthoringBundle`, `Bot`, `BotVersion` | No       |
-| Legacy Agent    | `Bot` and `BotVersion`                   | Inactive versions are editable, active versions are not      |
+| Agent Type      | Metadata Representation                  | Editable                                                |
+| :-------------- | :--------------------------------------- | :------------------------------------------------------ |
+| Draft Agent     | `AiAuthoringBundle`                      | Yes                                                     |
+| Committed Agent | `AiAuthoringBundle`, `Bot`, `BotVersion` | No                                                      |
+| Legacy Agent    | `Bot` and `BotVersion`                   | Inactive versions are editable, active versions are not |
 
-For more details, see [Agent Metadata: A Shallow Dive](../agent-dx-metadata.md) and [Agentforce Metadata Types](/docs/ai/agentforce/references/agents-metadata-tooling/agents-metadata.html).
+See [Agentforce Metadata Types](https://developer.salesforce.com/docs/ai/agentforce/references/agents-metadata-tooling/agents-metadatav67.md).
 
 ## Example package.xml Manifest Files
 
@@ -23,11 +23,11 @@ Use these examples to get started:
 - Replace the version number (for example, `<version>65.0</version>`) with your required metadata version. Your project's sample `package.xml` manifest contains the most recent version number.
 - Add any other metadata types that your agent needs, such as Data 360 dependencies.
 
-| Example Manifest                                                                                          | Description                                                                                                                               | Notes                                                                                                                                                                                                                                                               |
-| --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Manifest Defining All Agents (v67 and Earlier)](./package-allagents67.md)                                | Defines metadata for all agents, including legacy agents. Includes metadata for all flows, prompt templates, and Apex classes in the org. | Replace the `*` wildcard with the API names of the ApexClass, Flows, and GenAiPromptTemplates that your agents use. Using wildcards for these types can pull excessive data, leading to very long deployments or timeouts.                                          |
-| [Manifest Defining a Single Agent Version (v67 and Earlier)](./package-singleagent67.md)                  | Defines a single version of an agent, plus the flows, prompt templates, and Apex class types that the agent version uses.                 | Before deploying a single agent version into an org (using `BotVersion`), you must have deployed the full agent to the org. Deploying the agent before deploying a specific version ensures that all required metadata and artifacts are created in the target org. |
-| [Manifest for Different Bot/AiAuthoringBundle Versions (v67 and Earlier)](./package-single-mismatch67.md) | Defines a single agent version when the `AiAuthoringBundle` version doesn't match the `Bot`/`BotVersion` version.                         | This difference can happen when you save more versions than you commit. See [(Optional) - Update Your Manifest for Different Bot/AiAuthoringBundle Versions()](#optional---update-your-manifest-for-different-botaiauthoringbundle-versions).                       |
+| Example Manifest                                                                                                                  | Description                                                                                                                               | Notes                                                                                                                                                                                                                                                               |
+| --------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Manifest Defining All Agents (v67 and Earlier)](package-allagents67.md)                                | Defines metadata for all agents, including legacy agents. Includes metadata for all flows, prompt templates, and Apex classes in the org. | Replace the `*` wildcard with the API names of the ApexClass, Flows, and GenAiPromptTemplates that your agents use. Using wildcards for these types can pull excessive data, leading to very long deployments or timeouts.                                          |
+| [Manifest Defining a Single Agent Version (v67 and Earlier)](package-singleagent67.md)                  | Defines a single version of an agent, plus the flows, prompt templates, and Apex class types that the agent version uses.                 | Before deploying a single agent version into an org (using `BotVersion`), you must have deployed the full agent to the org. Deploying the agent before deploying a specific version ensures that all required metadata and artifacts are created in the target org. |
+| [Manifest for Different Bot/AiAuthoringBundle Versions (v67 and Earlier)](package-single-mismatch67.md) | Defines a single agent version when the `AiAuthoringBundle` version doesn't match the `Bot`/`BotVersion` version.                         | This difference can happen when you save more versions than you commit. See [(Optional) - Update Your Manifest for Different Bot/AiAuthoringBundle Versions()](#optional---update-your-manifest-for-different-botaiauthoringbundle-versions).                       |
 
 ### Update Your Manifest
 
@@ -77,4 +77,4 @@ For example, version 9 of the agent "TestAgentFromSource" uses version 7 of `Gen
 
 > *[Image removed — see online documentation]*
 
-Use these versions to specify your manifest, for example [Manifest for Different Bot/AiAuthoringBundle Versions (v67 and Earlier)](./package-single-mismatch67.md)
+Use these versions to specify your manifest, for example [Manifest for Different Bot/AiAuthoringBundle Versions (v67 and Earlier)](package-single-mismatch67.md)

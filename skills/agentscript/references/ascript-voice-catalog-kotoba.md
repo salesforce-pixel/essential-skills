@@ -1,6 +1,8 @@
 # Kotoba Voices
 
-This page lists the Kotoba voice personas and the locales each one supports. Kotoba provides the default voice for Japanese (`ja`): if you don't set a `persona_id` for a Japanese agent, it uses the voice marked **(default)** here. Set a `persona_id` only when you want a specific voice. For how to select a model and configure a voice, see [Configure Voice Models in Agent Script](ascript-voice.md).
+This is the catalog of speaking (text-to-speech) personas for the Kotoba TTS model. Personas apply only to speaking. To set up Kotoba for listening (speech-to-text), see [Select the Kotoba STT Model for Japanese](ascript-voice.md#select-the-kotoba-stt-model-for-japanese).
+
+This page lists the Kotoba voice personas and the locales each one supports. If you select Kotoba TTS and don't set a `persona_id`, the agent uses the voice marked **(default)** here. Set a `persona_id` only when you want a specific voice. For how to select a model and configure a voice, see [Configure Voice Models in Agent Script](ascript-voice.md).
 
 ## Japanese - ja
 

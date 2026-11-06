@@ -179,26 +179,27 @@ modality voice:
                 speed: 0.9
 ```
 
-The default voice model depends on the configured locale and the capabilities enabled for your org. Many locales use ElevenLabs v3 Conversational, while Japanese uses Kotoba. A locale's default can also be a Flash model. Check the available model and compatible persona for your target locale before adding an override. Use an explicit supported model when you need its particular capabilities, and verify the resulting voice through the intended channel.
+The block has two independent directions: `inbound` configures the speech-to-text (STT) model that listens to the customer, and `outbound` configures the text-to-speech (TTS) model that speaks. The default models depend on the configured locale and the capabilities enabled for your org. Check the available models and compatible persona for your target locale before adding an override, and verify the resulting voice through the intended channel.
 
-- To select a different voice model, see [Configure Voice Models in Agent Script](ascript-voice.md).
+- To see the available listening models, see [Models for Listening](ascript-voice.md#models-for-listening-inbound-speech-to-text).
+- To see the available speaking models, see [Models for Speaking](ascript-voice.md#models-for-speaking-outbound-text-to-speech).
 - To see the complete voice catalog, see [Voice Catalog for Agentforce Voice](ascript-voice-catalog.md).
 
 ### Voice Variables
 
-The `voice` variant supports these variables. All paths are relative to `modality voice:`, and all variables are optional.
+The `voice` variant supports these variables. All paths are relative to `modality voice:`, and all variables are optional. The table lists general and listening (`inbound`) variables first, then speaking (`outbound`) variables.
 
 | Variable                                                                       | Type            | Range      | Description                                                                                                                                                                                                                                                                       |
 | :----------------------------------------------------------------------------- | :-------------- | :--------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `language.default_locale`                                                      | string          |            | Voice locale. If a voice `language` block is present, provide a supported default locale. The top-level `language` block separately configures the agent's text languages.                                                                                                        |
 | `language.additional_locales`                                                  | list of strings |            | Explicit list of additional voice locales. Also declare them in the top-level text `language` block.                                                                                                                                                                              |
 | `language_settings.<locale>.inbound` and `language_settings.<locale>.outbound` | block           |            | Per-locale overrides with the same structure as `inbound` and `outbound`.                                                                                                                                                                                                         |
-| `inbound.filler_words_detection`                                               | boolean         |            | When `True`, filler words (like "um" and "uh") in the customer's speech are detected and ignored.                                                                                                                                                                                 |
+| `inbound.filler_words_detection`                                               | boolean         |            | When `True`, filler words (like "um" and "uh") are included in the transcript. When `False`, common filler words are left out.                                                                                                                                                    |
 | `inbound.keywords`                                                             | list of strings |            | Keywords that improve recognition of domain-specific terms.                                                                                                                                                                                                                       |
-| `inbound.model.id`                                                             | string          |            | ASR model identifier, where supported for the target locale and org.                                                                                                                                                                                                              |
-| `inbound.model.parameters`                                                     | block           |            | ASR model settings. The runtime can filter or ignore settings it doesn't support.                                                                                                                                                                                                 |
+| `inbound.model.id`                                                             | string          |            | Listening (STT) model identifier, where supported for the target locale and org. See [Models for Listening](ascript-voice.md#models-for-listening-inbound-speech-to-text).                                                                              |
+| `inbound.model.parameters`                                                     | block           |            | Listening (STT) model settings. The runtime can filter or ignore settings it doesn't support.                                                                                                                                                                                     |
 | `outbound.persona_id`                                                          | string          |            | The catalog identifier of a persona that's compatible with the model and locale. Omit it to use the locale's default persona. Don't substitute a provider voice ID or a voice name. See [Voice Catalog for Agentforce Voice](ascript-voice-catalog.md). |
-| `outbound.model.id`                                                            | string          |            | TTS model identifier supported for the target locale and org. If omitted, model selection follows the locale's default.                                                                                                                                                           |
+| `outbound.model.id`                                                            | string          |            | Speaking (TTS) model identifier supported for the target locale and org. If omitted, model selection follows the locale's default. See [Models for Speaking](ascript-voice.md#models-for-speaking-outbound-text-to-speech).                             |
 | `outbound.model.parameters`                                                    | block           |            | Scalar model settings. The parser accepts them without checking every model-specific name or range, and the runtime can filter or ignore them.                                                                                                                                    |
 | `outbound.model.parameters.speed`                                              | number          | 0.7 to 1.2 | Speech rate for models that honor it, such as Flash v2 and v2.5. v3 Conversational doesn't use it. These are runtime-supported values, not a range the parser enforces.                                                                                                           |
 | `outbound.pronunciations`                                                      | list            |            | Custom pronunciations for specialized words or names. Each entry needs `grapheme` (written form), `phoneme` (phonetic spelling), and `type` (`"IPA"` or `"CMU"`).                                                                                                                 |
@@ -207,13 +208,27 @@ The `voice` variant supports these variables. All paths are relative to `modalit
 
 Include all three pronunciation properties (`grapheme`, `phoneme`, and `type`) in every pronunciation entry, and use uppercase `IPA` or `CMU` for the `type`. A missing `grapheme` or `phoneme` causes an error. A missing `type` silently drops the entry, so a successful compile doesn't prove the pronunciation was kept.
 
-:::note
-Earlier versions of Agent Script used flat voice keys: `voice_id`, `outbound_speed`, `outbound_style_exaggeration`, `outbound_stability`, `outbound_similarity`, `inbound_filler_words_detection`, `inbound_keywords`, `outbound_filler_sentences`, and `pronunciation_dict`. Don't combine these with the nested variables in the same `modality voice` block. A block that mixes both formats fails with `Both Voice schema versions were detected, use only one at a time.` See [Configure Voice Models](ascript-voice.md) for the full diagnostic.
-
-To migrate, replace each flat key with its nested path and delete the flat key. For example, `outbound_stability` becomes `outbound.model.parameters.stability`, and `outbound_similarity` becomes `outbound.model.parameters.similarity`. `outbound_style_exaggeration` has no nested replacement, so remove it. `additional_configs` is shared by both formats and doesn't cause the error.
-
-A 20-character ElevenLabs voice ID, like the one the flat `voice_id` key took, isn't a `persona_id`. Use an identifier from the Voice Catalog.
+:::important
+Earlier versions of Agent Script used flat voice keys, such as `voice_id` and `outbound_speed`. Don't combine them with the nested variables in the same `modality voice` block. A block that mixes both formats fails with `Both Voice schema versions were detected, use only one at a time.` See [Configure Voice Models](ascript-voice.md) for the full diagnostic.
 :::
+
+### Migrate Legacy Voice Keys
+
+To migrate, replace each flat key with its nested variable and delete the flat key.
+
+| Legacy key                       | Nested variable                                                                                                           |
+| :------------------------------- | :------------------------------------------------------------------------------------------------------------------------ |
+| `voice_id`                       | `outbound.persona_id`. Use an identifier from the Voice Catalog. A 20-character ElevenLabs voice ID isn't a `persona_id`. |
+| `outbound_speed`                 | `outbound.model.parameters.speed`                                                                                         |
+| `outbound_stability`             | `outbound.model.parameters.stability`                                                                                     |
+| `outbound_similarity`            | `outbound.model.parameters.similarity`                                                                                    |
+| `outbound_style_exaggeration`    | No nested replacement. Remove it.                                                                                         |
+| `inbound_filler_words_detection` | `inbound.filler_words_detection`                                                                                          |
+| `inbound_keywords`               | `inbound.keywords`                                                                                                        |
+| `outbound_filler_sentences`      | `outbound.filler_sentences`                                                                                               |
+| `pronunciation_dict`             | `outbound.pronunciations`                                                                                                 |
+
+`additional_configs` is shared by both formats and doesn't cause the error.
 
 ### Additional Configs
 
@@ -241,7 +256,6 @@ modality voice:
     language:
         default_locale: "en_US"
     inbound:
-        filler_words_detection: True
         keywords:
             - "Agentforce"
         model:

@@ -44,10 +44,12 @@ If you’re following along with the instructions and your org runs into unexpec
 :::
 
 1. Log into the Salesforce Developer Edition org.
+
 2. From **Setup**, in the Quick Find box, enter `einstein setup`, and then select **Einstein Setup** and **Turn on Einstein**.
    > *[Image removed — see online documentation]*
 
 3. Search for `Agentforce Agents` and open it.
+
 4. Turn on Agentforce.
    > *[Image removed — see online documentation]*
 
@@ -65,12 +67,12 @@ If you already have Salesforce CLI installed, skip ahead to Step 3.
 sf org login web --alias your-org-alias
 ```
 
-3.  When the login window appears, log in to your org and click **Allow**.
+3. When the login window appears, log in to your org and click **Allow**.
 
-- Ensure you’ve enabled [Einstein and Agentforce](https://developer.salesforce.com/docs/ai/agentforce/guide/agent-dx-set-up-env.html#agentforce-developer-environments) in your org.
-- Ensure that you have the [required permissions](https://developer.salesforce.com/docs/ai/agentforce/guide/agent-dx-set-up-env.html#assign-system-permissions) to publish and preview an agent in your org.
+- Ensure you’ve enabled [Einstein and Agentforce](https://developer.salesforce.com/docs/ai/agentforce/guide/agent-dx-set-up-env.md#agentforce-developer-environments) in your org.
+- Ensure that you have the [required permissions](https://developer.salesforce.com/docs/ai/agentforce/guide/agent-dx-set-up-env.md#assign-system-permissions) to publish and preview an agent in your org.
 
-4.  In your terminal, run `sf org list`. If you see your org alias in the list, you’re successfully authenticated.
+4. In your terminal, run `sf org list`. If you see your org alias in the list, you’re successfully authenticated.
 
 ## Step 3: Add Agent Skills and Context to your Coding Agent
 
@@ -82,7 +84,7 @@ In your terminal, run this command:
 npx skills add forcedotcom/sf-skills
 ```
 
-To give your coding agent extra context, download the [Agent Script documentation](https://developer.salesforce.com/docs/ai/agentforce/guide/ascript-download-documentation.html) and add it to your coding agent’s root project directory.
+To give your coding agent extra context, download the [Agent Script documentation](https://developer.salesforce.com/docs/ai/agentforce/guide/ascript-download-documentation.md) and add it to your coding agent’s root project directory.
 
 ## Start Building
 
@@ -389,14 +391,14 @@ In experience_concierge, define identify_guest with no available when guard -- t
 
 For example, using these prompts, your agent should provide similar replies:
 
-| Prompt                                                         | Reply                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Isabella Reyes wants to book an experience. what is available? | To assist Isabella Reyes with booking an experience, I first need to confirm her reservation details. Could you please provide the email address on her reservation?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| isabella.reyes@example.com                                     | These experiences match Isabelle's interests of snorkeling, surfing, and fitness:<br><br>• Beach Yoga at Sunrise on July 18 — South Beach Lawn · $30 · 1 hour Start your day grounded with a gentle vinyasa flow on the sand as the sun rises over the water. Mats provided.<br>• Coral Reef Snorkeling Tour on July 20 — North Reef Dock · $85 · 2.5 hours Explore the vibrant coral reefs just offshore with a certified guide. Fins, mask, and snorkel provided. Suitable for confident swimmers.<br>• Beginner Surf Lesson on July 21 — South Beach Break · \$65 · 1.5 hours Catch your first wave with our patient, ISA-certified instructors. Soft-top boards and rash guards provided. No experience needed. |
+| Prompt                                                         | Reply                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Isabella Reyes wants to book an experience. what is available? | To assist Isabella Reyes with booking an experience, I first need to confirm her reservation details. Could you please provide the email address on her reservation?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| <isabella.reyes@example.com>                                   | These experiences match Isabelle's interests of snorkeling, surfing, and fitness:<br><br>• Beach Yoga at Sunrise on July 18 — South Beach Lawn · $30 · 1 hour Start your day grounded with a gentle vinyasa flow on the sand as the sun rises over the water. Mats provided.<br>• Coral Reef Snorkeling Tour on July 20 — North Reef Dock · $85 · 2.5 hours Explore the vibrant coral reefs just offshore with a certified guide. Fins, mask, and snorkel provided. Suitable for confident swimmers.<br>• Beginner Surf Lesson on July 21 — South Beach Break · $65 · 1.5 hours Catch your first wave with our patient, ISA-certified instructors. Soft-top boards and rash guards provided. No experience needed. |
 
-| Prompt                                                                                                 | Reply                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| What are some experiences I could recommend to James Nakamura? His email is james.nakamura@example.com | These experiences match Jame's interest of Whale Watching, Sunset Sail, and Dining. The agent also addressed the client by their preferred name, "Jamie"<br><br>Jamie has two wonderful experiences available during their stay at Palonia Resort:<br>• Whale Watching Voyage on July 22 — Head out to open water aboard our catamaran to spot humpback and pilot whales. Onboard naturalist and light refreshments included. ($120, 3 hours, departs from Main Marina)<br>• Sunset Sail on July 23 — Unwind aboard a classic sailing yacht as the sun dips below the horizon. Sparkling wine and canapés served onboard. ($95, 2 hours, departs from Main Marina) |
+| Prompt                                                                                                   | Reply                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| What are some experiences I could recommend to James Nakamura? His email is <james.nakamura@example.com> | These experiences match Jame's interest of Whale Watching, Sunset Sail, and Dining. The agent also addressed the client by their preferred name, "Jamie"<br><br>Jamie has two wonderful experiences available during their stay at Palonia Resort:<br>• Whale Watching Voyage on July 22 — Head out to open water aboard our catamaran to spot humpback and pilot whales. Onboard naturalist and light refreshments included. ($120, 3 hours, departs from Main Marina)<br>• Sunset Sail on July 23 — Unwind aboard a classic sailing yacht as the sun dips below the horizon. Sparkling wine and canapés served onboard. ($95, 2 hours, departs from Main Marina) |
 
 ## Conclusion
 
@@ -404,7 +406,7 @@ Now that you’ve learned how to describe an idea to an AI coding assistant, you
 
 ## Troubleshooting
 
-If you see an error, copy the full error text and paste it into your AI assistant: "I'm seeing this error — help me fix it: [paste error]". Screenshots work too.
+If you see an error, copy the full error text and paste it into your AI assistant: "I'm seeing this error — help me fix it: \[paste error]". Screenshots work too.
 
 **Step 1 fails — sf not found**: Install Salesforce CLI and ensure sf is on your PATH. Run: `sf --version`
 
@@ -424,4 +426,4 @@ If you see an error, copy the full error text and paste it into your AI assistan
 
 **Guest Concierge Agent not appearing in Agent Builder after deploy**: Confirm the .agent file is under force-app/main/default/agents/ and the deploy completed without errors. Re-run `sf project deploy start` and check for metadata validation failures.
 
-**Agent returns no experiences**: Confirm the guest record has Interest_1\_\_c, Interest_2\_\_c, or Interest_3\_\_c populated, and that Experience_Session\_\_c records exist with dates within the guest's reservation window. Verify the guest's Reservation\_\_c Status\_\_c is "Booked" or "Checked In". Check the Get_Guest_Available_Experiences flow in Flow Builder and use Debug to trace the session query results. Verify sample data was imported successfully in Step 02.
+**Agent returns no experiences**: Confirm the guest record has Interest\_1\__c, Interest\_2\__c, or Interest\_3\__c populated, and that Experience_Session\_\_c records exist with dates within the guest's reservation window. Verify the guest's Reservation\_\_c Status\_\_c is "Booked" or "Checked In". Check the Get_Guest_Available_Experiences flow in Flow Builder and use Debug to trace the session query results. Verify sample data was imported successfully in Step 02.

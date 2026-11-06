@@ -1,10 +1,10 @@
 # ADL Agent Example - Demystify Jargon with Knowledge
 
-Ensure that your [grounded](https://help.salesforce.com/s/articleView?id=ai.agent_parent_data.htm&type=5) agent understands your organization's evolving jargon, domain-specific terms, or updated product names — without having to update and reindex your information sources.
+Ensure that your [grounded](https://help.salesforce.com/s/articleView?id=ai.agent_parent_data.htm\&type=5) agent understands your organization's evolving jargon, domain-specific terms, or updated product names — without having to update and reindex your information sources.
 
 ## The Problem
 
-Grounded agents are grounded in information, either using an [Agentforce Data Library](https://help.salesforce.com/s/articleView?id=ai.data_library_parent.htm&type=5) or [Retrieval Augmented Generation](https://help.salesforce.com/s/articleView?id=ai.generative_ai_rag.htm&language=en_US&type=5). However, the grounding information might contain only formal names while customers use jargon, acronyms, or new names. Even if the grounding information contains both correct and jargon terms, it might be [indexed](https://help.salesforce.com/s/articleView?id=data.c360_a_search_index_manage.htm&type=5) only on the correct names — so the retriever or data library misses relevant chunks even though correct information exists.
+Grounded agents are grounded in information, either using an [Agentforce Data Library](https://help.salesforce.com/s/articleView?id=ai.data_library_parent.htm\&type=5) or [Retrieval Augmented Generation](https://help.salesforce.com/s/articleView?id=ai.generative_ai_rag.htm\&language=en_US\&type=5). However, the grounding information might contain only formal names while customers use jargon, acronyms, or new names. Even if the grounding information contains both correct and jargon terms, it might be [indexed](https://help.salesforce.com/s/articleView?id=data.c360\_a_search_index_manage.htm\&type=5) only on the correct names — so the retriever or data library misses relevant chunks even though correct information exists.
 
 Updating and reindexing an agent's grounding information (which typically contains thousands of articles) can be time-consuming and involve special roles. Plus, jargon can change quickly!
 
@@ -35,7 +35,7 @@ To follow along with this example, you can sign up for a free Salesforce Develop
 Instead of signing up for a new org, you can re-use an existing developer org.
 :::
 
-For a complete Agentforce implementation guide, see [Create Agents in Record Time with Agentforce Implementation Guides](https://help.salesforce.com/s/articleView?id=ai.agent_resources.htm&type=5).
+For a complete Agentforce implementation guide, see [Create Agents in Record Time with Agentforce Implementation Guides](https://help.salesforce.com/s/articleView?id=ai.agent_resources.htm\&type=5).
 
 ### Sign Up for a Developer Org
 
@@ -68,7 +68,7 @@ After you turn on Einstein, it can take a few minutes to sync Einstein and Data 
 
 Turn on Agentforce to start building, customizing, testing, and launching AI agents.
 
-1. From Setup, in the Quick Find box, enter Agent, and then select **Agentforce Agents**.  
+1. From Setup, in the Quick Find box, enter Agent, and then select **Agentforce Agents**.\
    If you don’t see Agents in Setup, verify that Einstein Generative AI is enabled for your org.
 2. To enable Agentforce, turn on **Agentforce**.
 
@@ -94,16 +94,16 @@ The agent opens in canvas view. You can see that the Service Agent template prov
 
 ## Create Your Data Library
 
-To ground your agent’s responses in Aura & Ash's product information, you'll create a [data library](https://help.salesforce.com/s/articleView?id=ai.data_library_parent.htm&type=5) and upload a PDF.
+To ground your agent’s responses in Aura & Ash's product information, you'll create a [data library](https://help.salesforce.com/s/articleView?id=ai.data_library_parent.htm\&type=5) and upload a PDF.
 
-1.  Download the [Aura_Ash_Product_Instructions.pdf](https://resources.docs.salesforce.com/rel1/doc/en-us/static/pdf/Aura_Ash_Product_Instructions.pdf). This PDF provides brief usage instructions for skincare products, but uses the old product names.
-2.  Leave your agent open in a browser tab. From Setup, in the Quick Find box, enter `Data Library`, and then select **Agentforce Data Library**.
-3.  Click **New Library**.
-4.  For the library name, enter `Aura and Ash Products`. The API name is automatically populated.
-5.  For the description, enter `Sources for Aura & Ash Customer Service agent’s product usage agent`.
-6.  Save your changes.
-7.  In the Data Type field, select **Files**.
-8.  Click **Select Files**, then upload the `Aura & Ash Product Instructions.pdf` file from wherever you saved it on your computer. When your file is finished uploading, click **Done**.
+1. Download the [Aura_Ash_Product_Instructions.pdf](https://resources.docs.salesforce.com/rel1/doc/en-us/static/pdf/Aura_Ash_Product_Instructions.pdf). This PDF provides brief usage instructions for skincare products, but uses the old product names.
+2. Leave your agent open in a browser tab. From Setup, in the Quick Find box, enter `Data Library`, and then select **Agentforce Data Library**.
+3. Click **New Library**.
+4. For the library name, enter `Aura and Ash Products`. The API name is automatically populated.
+5. For the description, enter `Sources for Aura & Ash Customer Service agent’s product usage agent`.
+6. Save your changes.
+7. In the Data Type field, select **Files**.
+8. Click **Select Files**, then upload the `Aura & Ash Product Instructions.pdf` file from wherever you saved it on your computer. When your file is finished uploading, click **Done**.
 
 Salesforce takes some time to create your data library. Wait until the Status is `Ready` — you might need to refresh your page.
 
@@ -148,9 +148,9 @@ This example walks you through a basic Knowledge setup that meets the needs of t
 Assign your user the Knowledge user license so you can create Knowledge articles.
 
 1. From **Setup**, in the Quick Find box, enter and select **Users**.
-1. Next to your user name, click **Edit**.
-1. Select the **Knowledge User** checkbox.
-1. Click **Save**.
+2. Next to your user name, click **Edit**.
+3. Select the **Knowledge User** checkbox.
+4. Click **Save**.
 
 ### Enable Salesforce Knowledge
 
@@ -166,19 +166,25 @@ This example adds a custom field to the Knowledge layout. If your organization a
 :::
 
 1. In Setup, select **Object Manager**.
+
 2. In Quick Find, enter and select **Knowledge** (API name `Knowledge__kav`).
+
 3. Select **Fields & Relationships** then click **New**.
+
 4. Select **Text Area** (Long) and click **Next**.
+
 5. Enter this information:
-   | Field | Value |
-   | :---- | :---- |
-   | Field Label | `Alternate Product Names` |
-   | Description | `New or alternate names, acronyms, and slang terms for products`|
-   | Visible lines| `40` |
-   | Field Name | Accept `Alternate_Product_Names__c`|
+   | Field         | Value                                                            |
+   | :------------ | :--------------------------------------------------------------- |
+   | Field Label   | `Alternate Product Names`                                        |
+   | Description   | `New or alternate names, acronyms, and slang terms for products` |
+   | Visible lines | `40`                                                             |
+   | Field Name    | Accept `Alternate_Product_Names__c`                              |
 
 6. Leave all other fields the same and click **Next**.
+
 7. Ensure the new field is visible to the Einstein Agent User and click **Next**.
+
 8. Select the box next to **Knowledge Layout** and click **Save**.
 
 The new field is created and added to the Knowledge page layout.
@@ -196,8 +202,9 @@ Your agent user needs read permissions on the Knowledge object,`Knowledge__kav`,
 7. Click **Save**.
 
 > *[Image removed — see online documentation]*
+
 :::note
-Always give your agent user the fewest permissions it needs to do its job. In this example, our EinsteinServiceAgent user doesn't need write access. For more information about service agent permissions, see [(Help:) Best Practices for Agent User Permissions](https://help.salesforce.com/s/articleView?id=ai.agent_user.htm&type=5).
+Always give your agent user the fewest permissions it needs to do its job. In this example, our EinsteinServiceAgent user doesn't need write access. For more information about service agent permissions, see [(Help:) Best Practices for Agent User Permissions](https://help.salesforce.com/s/articleView?id=ai.agent_user.htm\&type=5).
 :::
 
 ### Give Your Agent User Access to Knowledge
@@ -212,7 +219,7 @@ You can't give the agent user a Knowledge license, but you can grant the Allow V
 6. Select **Allow View Knowledge**.
 7. Click **Save**.
 
-Your agent user has permissions to view Knowledge articles. For more information about agent user permissions, see [(_Help_):Best Practices for Agent User Permissions](https://help.salesforce.com/s/articleView?id=ai.agent_user.htm&type=5).
+Your agent user has permissions to view Knowledge articles. For more information about agent user permissions, see [(*Help*):Best Practices for Agent User Permissions](https://help.salesforce.com/s/articleView?id=ai.agent_user.htm\&type=5).
 
 ### Create a Knowledge Article
 
@@ -277,16 +284,17 @@ Create a flow that looks up your knowledge article by article ID.
 
 To test your flow and make sure your agent has all of the required permissions to run it, debug the flow as your agent user.
 
-1.  Give yourself permission to debug your flow as another user.
+1. Give yourself permission to debug your flow as another user.
 
-    - From Setup, in the Quick Find box, enter `Process Automation`, and then select **Process Automation Settings**.
-    - Select **Let admins debug flows as other users** then click **Save**.
+   - From Setup, in the Quick Find box, enter `Process Automation`, and then select **Process Automation Settings**.
+   - Select **Let admins debug flows as other users** then click **Save**.
 
-2.  In Flow Builder, click **Debug**.
-    - Select **Run automation as another user**, and then select your EinsteinServiceAgent User.
-    - For articleNumber, enter the article number for your Aura & Ash Updated Product Names article. You saved this number in a previous step.
-    - Click **Run** and expand Details to see the returned list of product names.
-3.  To activate the flow, click **Activate**.
+2. In Flow Builder, click **Debug**.
+   - Select **Run automation as another user**, and then select your EinsteinServiceAgent User.
+   - For articleNumber, enter the article number for your Aura & Ash Updated Product Names article. You saved this number in a previous step.
+   - Click **Run** and expand Details to see the returned list of product names.
+
+3. To activate the flow, click **Activate**.
 
 **Tip**: If you get an error running the flow as the EinsteinServiceAgent user, switch to your user. If the flow is successful running under your user, check the EinsteinServiceAgent's permissions.
 
@@ -300,26 +308,26 @@ You'll use the Old2NewProductNames variable to store the mapped product names th
 
 1. In your agent's Explorer panel, click **Variables**.
 2. In the upper right of the Canvas, click **New**, then select **Create Custom Variable**.
-3. Use these values to create your variable.  
-   | Field | Value |
-   |-----------------|-----------------------------------------------------|
-   | Name and API Name | Old2NewProductNames |
-   | Data Type | String |
-   | Description | Maps the old product names to the new product names. |
-   | Default value | NotRun |
+3. Use these values to create your variable.
+   | Field             | Value                                                |
+   | ----------------- | ---------------------------------------------------- |
+   | Name and API Name | Old2NewProductNames                                  |
+   | Data Type         | String                                               |
+   | Description       | Maps the old product names to the new product names. |
+   | Default value     | NotRun                                               |
 4. Click **Create**, then save your agent.
 
 Your **Old2NewProductNames** variable is created.
 
 ### Create the GetNewProductNames Action
 
-1. In Agentforce Builder, from the Explorer tab, expand **Subagents** \> **General FAQ.**
+1. In Agentforce Builder, from the Explorer tab, expand **Subagents** > **General FAQ.**
 2. Click the **plus sign** **(+)** next to General FAQ and select **Create New Action**.
-3. Set these fields on your action.  
-   | Field | Value |
-   |---------------|-------------------------------|
-   | Action Name | GetNewProductNames |
-   | Description | Get the new names for products.|
+3. Set these fields on your action.
+   | Field       | Value                           |
+   | ----------- | ------------------------------- |
+   | Action Name | GetNewProductNames              |
+   | Description | Get the new names for products. |
 4. Click **Create and Open**.
 5. For the reference action type, select **Flow**.
 6. For the reference action, select your **Alternate Product Names** flow.
@@ -384,9 +392,9 @@ You can see that your Get Alternate Product Names action is run only once.
 
 This example's Agent Script uses these [patterns and best practices](../patterns/ascript-patterns.md).
 
-| Pattern                                                                                | Usage in Script                                                                                                                                                                                                                                                                                                                                                |
-| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pattern                                                                                 | Usage in Script                                                                                                                                                                                                                                                                                                                                                |
+| --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Fetch Data Before Reasoning](../patterns/ascript-patterns-fetch-data.md) | The flow runs **before** the prompt is sent to the LLM, so the agent always has our updated product names.                                                                                                                                                                                                                                                     |
 | [Using Conditionals](../patterns/ascript-patterns-conditionals.md)        | The `if @variables.Old2NewProductNames == "NotRun"` check ensures the action is run only once, reducing processing and potentially cost.                                                                                                                                                                                                                       |
 | [Using Variables Effectively](../patterns/ascript-patterns-variables.md)  | `Old2NewProductNames` has a default value, so we can check when it's not been used.                                                                                                                                                                                                                                                                            |
-| Verify the agent with a known failure case                                             | LLMs can infer a surprising amount of information and have been trained on a vast array of public knowledge. Before injecting the prompt with our product name map, we verified the agent didn't understand the new product names. That way, we're confident that the updated name information is coming from our map, not from inference or public knowledge. |
+| Verify the agent with a known failure case                                              | LLMs can infer a surprising amount of information and have been trained on a vast array of public knowledge. Before injecting the prompt with our product name map, we verified the agent didn't understand the new product names. That way, we're confident that the updated name information is coming from our map, not from inference or public knowledge. |

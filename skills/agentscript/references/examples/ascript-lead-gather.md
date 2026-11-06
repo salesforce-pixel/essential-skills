@@ -13,7 +13,7 @@ A common agent pattern is to collect a lot of information from a customer, ask c
 
 ### The Solution
 
-One solution is to create two subagents. (One subagent)[#add-the-lead-gather-subagent] gathers customer information and stores the information in variables. The subagent's `after_reasoning` block checks whether all variables have values - if so, it runs the action to create the record. If the record ID is returned (indicating the record was created), the `after_reasoning` block transitions to a second subagent, which reports the record creation to the customer.
+One solution is to create two subagents. (One subagent)\[#add-the-lead-gather-subagent] gathers customer information and stores the information in variables. The subagent's `after_reasoning` block checks whether all variables have values - if so, it runs the action to create the record. If the record ID is returned (indicating the record was created), the `after_reasoning` block transitions to a second subagent, which reports the record creation to the customer.
 
 ## Create a Flow to Create the Lead Record from Fields
 
@@ -55,6 +55,7 @@ Before creating a new lead record, we'll use the provided email and company name
 1. Add a Get Records Element.
    1. For the label, enter **Get Existing Lead**.
    2. For the object, select **Lead**.
+
 2. Under Filter Lead Records, select **All Conditions Are Met (AND)**, then enter these values:
 
    | Field   | Operator | Value   |
@@ -63,8 +64,11 @@ Before creating a new lead record, we'll use the provided email and company name
    | Company | Equals   | Company |
 
 3. Under Sort Lead Records, for Sort Order, select **Not Sorted**.
+
 4. Under How Many Records to Store, select **Only the first record**.
+
 5. Under How to Store Record Data, select **Choose fields and let Salesforce do the rest**.
+
 6. Under Select Lead Fields to Store in Variable, leave the first Field set to **Id**. You don't need to add additional fields — the flow only uses the lead Id to detect an existing record.
 
 > *[Image removed — see online documentation]*
@@ -75,7 +79,9 @@ Branch the flow based on whether Get Existing Lead returned a matching lead.
 
 1. Add a Decision element after **Get Existing Lead**.
    1. For the label, enter **Lead Exists?**. The API Name auto-fills as `Lead_Exists`.
+
 2. Under Select Decision Logic, select **Define Manually (Default)**.
+
 3. Under Outcomes, configure the **Yes** outcome to run when a matching Lead was found.
 
    1. For Outcome Label, enter **Yes**.
@@ -126,8 +132,11 @@ Add an element to create the lead, mapping the agent action's values to the vari
 
 1. On the **No** outcome from **Lead Exists?**, add a Create Records element.
    1. For the label, enter **Create Lead**. The API Name auto-fills as `Create_Lead`.
+
 2. For How to set record field values, select **Manually**.
+
 3. Under Create a Record of This Object, for Object, select **Lead**.
+
 4. Under Set Field Values for the lead, add a row for each of these fields and map it to the indicated variable.
 
    | Field       | Value              |
@@ -140,8 +149,11 @@ Add an element to create the lead, mapping the agent action's values to the vari
    | Phone       | `Phone`            |
 
 5. Select **Manually assign variables (advanced)**.
+
 6. Under Store Lead ID in Variable, for Variable, select **`leadRecordId`**.
+
 7. Leave **Check for Matching Records** disabled — the **Lead Exists?** decision already handles the duplicate check.
+
 8. Click **Save**.
 
 > *[Image removed — see online documentation]*
@@ -151,9 +163,12 @@ Add an element to create the lead, mapping the agent action's values to the vari
 If the Create Lead element fails at runtime (for example, a validation rule rejects the record), the flow returns a lead Id anyway unless you explicitly clear it. Add a fault path that resets `leadRecordId` so the agent's `after_reasoning` gate treats the create as unsuccessful.
 
 1. Hover over the **Create Lead** element so the three dots appear.
+
 2. Click the three dots and select **Add Fault Path**.
+
 3. On the fault path, add an Assignment element.
    1. For the label, enter **Clear LeadId On Fault**. The API Name auto-fills as `Clear_LeadId_On_Fault`.
+
 4. Under Set Variable Values, add this assignment:
 
    | Variable       | Operator | Value                      |
@@ -356,7 +371,7 @@ Your agent user needs permission to read and create leads.
 > *[Image removed — see online documentation]*
 
 :::note
-Always give your agent user the fewest permissions it needs to do its job. For more information about service agent permissions, see [(Help:) Best Practices for Agent User Permissions](https://help.salesforce.com/s/articleView?id=ai.agent_user.htm&type=5).
+Always give your agent user the fewest permissions it needs to do its job. For more information about service agent permissions, see [(Help:) Best Practices for Agent User Permissions](https://help.salesforce.com/s/articleView?id=ai.agent_user.htm\&type=5).
 :::
 
 ## Test Your Agent

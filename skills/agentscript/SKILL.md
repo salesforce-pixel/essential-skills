@@ -15,11 +15,17 @@ description: >-
   ADLC workflow and CLI commands; this skill is the language grounding plus
   supporting metadata/deploy reference.
 metadata:
-  version: "2.1"
+  version: "2.2"
 ---
 
 <!--
 Changelog
+2.2 — Automated copy-replace refresh from the live doc site (2026-11-06).
+      • 14 page(s) changed.
+      • First run of tools/doc-refresh: all 52 pages now come from the live site
+        (43 discovered via llms-genai.txt + 9 pinned), so the last 2026-09-17 zip
+        copies (agent-script, examples/*, deploy-metadata/*) are gone.
+      • Changed: agent-dx-api-v67-earlier, agent-dx-deploy-metadata, agent-examples, agent-script, apex-examples-custom-action, ascript-blocks, ascript-example-rag-jargon, ascript-examples-customer-support, ascript-lead-gather, ascript-voice, ascript-voice-catalog, ascript-voice-catalog-kotoba, headless-example-org-build, package-single-mismatch67.
 2.1 — Full replace of 37 pages from the LIVE doc site (2026-11-01), fetched as
       markdown from developer.salesforce.com/docs/ai/agentforce/guide/<page>.md
       (no word-by-word diffing). Covers every top-level ascript-* page, all
@@ -129,9 +135,9 @@ Changelog
 # Agent Script Reference
 
 Authoritative documentation bundle for **Salesforce Agent Script** (the language for
-building Agentforce agents in Agentforce Builder). Source: official Salesforce docs under `references/` — language, patterns, and
-reference pages synced from the live doc site on 2026-11-01; overview, examples, and
-deploy-metadata pages from the 2026-09-17 `AgentScriptDocs.zip`.
+building Agentforce agents in Agentforce Builder). Source: official Salesforce docs under `references/`, all
+pages copy-replaced from the live doc site on 2026-11-06 (pages listed in
+`llms-genai.txt` plus pinned examples/deploy-metadata pages; see `tools/doc-refresh/`).
 
 Use this to ground any Agent Script you write or review against correct syntax and
 established patterns — do not rely on memory for syntax. Open the specific reference
@@ -220,5 +226,5 @@ ADLC workflow itself (still `developing-agentforce`'s job).
   each keyword against `reference/ascript-reference.md`.
 - `.agent` files in a Salesforce DX project live under an `aiAuthoringBundle`; use the
   developing-agentforce skill + `sf agent` CLI for generate/preview/publish/test/deploy.
-- These docs are a local snapshot (live site 2026-11-01 / zip 2026-09-17). If
+- These docs are a local snapshot (live site 2026-11-06). If
   something looks newer in the org, trust the org and flag the discrepancy.

@@ -22,7 +22,7 @@ ElevenLabs Flash v2 is a lower-latency model you select in Agent Script for Engl
 
 ## Kotoba Voices
 
-Kotoba is a voice model for Japanese (`ja`) and provides the default voice for that locale. See [Kotoba Voices](ascript-voice-catalog-kotoba.md).
+Kotoba is a voice model for Japanese (`ja`). See [Kotoba Voices](ascript-voice-catalog-kotoba.md).
 
 ## Related Topics
 

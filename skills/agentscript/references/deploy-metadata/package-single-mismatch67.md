@@ -3,7 +3,7 @@
 This example `package.xml` manifest file defines the metadata to retrieve version 9 of the TestAgentFromSource agent, which corresponds to version 7 of GenAiPlannerBundle and BotVersion. The file also defines the agent's flows, prompt templates, and Apex classes.
 
 :::note
-Before deploying a single agent version into an org, you must first deploy the full agent. See [Manifest Defining All Agents (v67 and Earlier)](./package-allagents67.md).
+Before deploying a single agent version into an org, you must first deploy the full agent. See [Manifest Defining All Agents (v67 and Earlier)](package-allagents67.md).
 :::
 
 ```xml

@@ -14,10 +14,10 @@ The agent contains three subagents:
 
 Before you build the agent on any path, make sure that your org is ready:
 
-- **Einstein and Agentforce are enabled.** See [Set Up Einstein and Agentforce](../../org-setup.md).
+- **Einstein and Agentforce are enabled.** See [Set Up Einstein and Agentforce](https://developer.salesforce.com/docs/ai/agentforce/guide/org-setup.md).
 - **You have an active user for the agent.** Every agent runs as a specific user. These examples use `agentforce@salesforce.com` as a placeholder for the `default_agent_user` — replace it with an active Einstein Agent User in your own org. To find one, in Setup go to **Users**, or query `SELECT Username FROM User WHERE UserType = 'EinsteinAgent' AND IsActive = true`.
 - **The flows the agent calls exist in your org.** See [Flows This Agent Calls](#flows-this-agent-calls). If they don't exist yet, stub them so you can preview the agent end-to-end.
-- For the Headless and Script paths, **the Salesforce CLI must be installed and authorized to your org**. See [Set Up Your DX Environment](../agent-dx/agent-dx-set-up-env.md).
+- For the Headless and Script paths, **the Salesforce CLI must be installed and authorized to your org**. See [Set Up Your DX Environment](https://developer.salesforce.com/docs/ai/agentforce/guide/agent-dx-set-up-env.md).
 
 ### Flows This Agent Calls
 
@@ -36,8 +36,8 @@ If a flow doesn't exist in your org, the agent won't publish — a flow action c
 
 A stub flow needs only three things:
 
-1. **Input variables** that match the action's inputs (marked _Available for input_), so the agent can pass values in.
-2. **Output variables** that match the action's outputs (marked _Available for output_), so the agent can read results back.
+1. **Input variables** that match the action's inputs (marked *Available for input*), so the agent can pass values in.
+2. **Output variables** that match the action's outputs (marked *Available for output*), so the agent can read results back.
 3. **An Assignment element** that sets each output variable to a fixed value.
 
 For example, a `validate_Verification_Code` stub takes a `verification_code` input, ignores it, and assigns `true` to a `verification` output — so any code the customer enters passes. A `Get_Verification_Code` stub returns a fixed `verification_code` (such as `123456`) and a `member_name`. Give each stub the exact flow name and variable names from the table above, deploy it (`sf project deploy start`), then build the agent.
@@ -46,21 +46,19 @@ For example, a `validate_Verification_Code` stub takes a `verification_code` inp
 
 You can build this agent three ways. Select a tab to follow that path from start to finish.
 
-| If you're a…                          | You'll build with…                                                                | Open the tab… |
-| ------------------------------------- | --------------------------------------------------------------------------------- | ------------- |
-| **Vibe coder** (instruct an AI agent) | Natural-language prompts to an AI coding agent, no platform UI required           | **Headless**  |
-| **Developer** (code)                  | Agent Script in Script view, [Agentforce DX](../agent-dx/agent-dx.md), or the CLI | **Script**    |
-| **Admin** (clicks, not code)          | Agentforce Builder Canvas view                                                    | **Canvas**    |
+| If you're a…                          | You'll build with…                                                                              | Open the tab… |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------- |
+| **Vibe coder** (instruct an AI agent) | Natural-language prompts to an AI coding agent, no platform UI required                         | **Headless**  |
+| **Developer** (code)                  | Agent Script in Script view, [Agentforce DX](https://developer.salesforce.com/docs/ai/agentforce/guide/agent-dx.md), or the CLI | **Script**    |
+| **Admin** (clicks, not code)          | Agentforce Builder Canvas view                                                                  | **Canvas**    |
 
 <br/>
 
-::::::tabset{tabs='["Headless", "Script", "Canvas"]'}
-
-:::::tab
-
+:::::tabset{tabs="[&#x22;Headless&#x22;, &#x22;Script&#x22;, &#x22;Canvas&#x22;]"}
+:::tab
 Build the agent by describing what you want in natural language and letting an AI coding agent generate the metadata for you — no platform UI required. To get reliable results, use a coding agent that has Salesforce development context loaded, so it follows platform best practices and produces valid Agent Script.
 
-- [Agentforce Vibes](https://developer.salesforce.com/docs/platform/agentforcevibes/guide/afv-overview.html) is Salesforce's AI-assisted development tool, built for headless development on the platform.
+- [Agentforce Vibes](https://developer.salesforce.com/docs/platform/agentforcevibes/guide/afv-overview.md) is Salesforce's AI-assisted development tool, built for headless development on the platform.
 - The [Salesforce Skills Library](https://github.com/forcedotcom/sf-skills) provides skills you can add to any coding agent that supports them, so the agent follows Salesforce best practices.
 - If you're building your own AI solution, add the Agent Script documentation set as context. See [Download the Agent Script Documentation](../ascript-download-documentation.md).
 
@@ -108,13 +106,11 @@ Add an Order Management subagent. When the customer enters this subagent and the
 
 ### Headless Step 6: Preview and Test
 
-Deploy the agent to your org with the Salesforce CLI or your coding agent's MCP connection, then open it in Agentforce Builder and select **Preview**. Start a conversation, such as _I need help with my order_, and confirm the agent asks you to verify your identity first.
+Deploy the agent to your org with the Salesforce CLI or your coding agent's MCP connection, then open it in Agentforce Builder and select **Preview**. Start a conversation, such as *I need help with my order*, and confirm the agent asks you to verify your identity first.
+:::
 
-:::::
-
-:::::tab
-
-Build the agent by writing Agent Script directly in Script view, in [Agentforce DX](../agent-dx/agent-dx.md), or with the CLI. The snippets below assemble into the complete script in [The Complete Script](#the-complete-script) at the end of this tab.
+::::tab
+Build the agent by writing Agent Script directly in Script view, in [Agentforce DX](https://developer.salesforce.com/docs/ai/agentforce/guide/agent-dx.md), or with the CLI. The snippets below assemble into the complete script in [The Complete Script](#the-complete-script) at the end of this tab.
 
 ### Script Step 1: Scaffold the Agent
 
@@ -141,9 +137,7 @@ language:
 ```
 
 :::note
-
 Replace `agentforce@salesforce.com` with an active Einstein Agent User in your org. The agent won't publish with a `default_agent_user` that doesn't exist. See [Prerequisites](#prerequisites).
-
 :::
 
 ### Script Step 2: Define the Variables
@@ -325,13 +319,11 @@ subagent Order_Management:
 
 ### Script Step 6: Preview and Test
 
-In Script view, select **Preview** and start a conversation, such as _I need help with my order_. Confirm that the agent asks you to verify your identity first, and that order details return correctly after verification.
+In Script view, select **Preview** and start a conversation, such as *I need help with my order*. Confirm that the agent asks you to verify your identity first, and that order details return correctly after verification.
 
 :::tip
-
 - Each agent needs a unique `developer_name`. If you make multiple agents from one example script, change the developer name each time.
 - If you encounter an unexpected error in Agentforce Builder with the last line of your script, add a blank line or a comment to the end.
-
 :::
 
 ### The Complete Script
@@ -513,16 +505,14 @@ subagent Order_Management:
             target: "flow://Get_Current_Order"
 # End of customer support script
 ```
+::::
 
-:::::
-
-:::::tab
-
-Build the agent with clicks in Agentforce Builder's Canvas view, which summarizes Agent Script into easily understandable blocks. For full details on the features used here, see [Building Agents in Canvas View](https://help.salesforce.com/s/articleView?id=ai.agent_canvas.htm&type=5).
+:::tab
+Build the agent with clicks in Agentforce Builder's Canvas view, which summarizes Agent Script into easily understandable blocks. For full details on the features used here, see [Building Agents in Canvas View](https://help.salesforce.com/s/articleView?id=ai.agent_canvas.htm\&type=5).
 
 ### Canvas Step 1: Scaffold the Agent
 
-[Create an agent](https://help.salesforce.com/s/articleView?id=ai.agent_setup_create.htm&type=5) in Agentforce Builder. In the setup flow, set the agent's name, running user, description, and tone — the foundation that the agent's instructions and welcome message build on. When you finish, Agentforce Builder opens your new agent in Canvas view.
+[Create an agent](https://help.salesforce.com/s/articleView?id=ai.agent_setup_create.htm\&type=5) in Agentforce Builder. In the setup flow, set the agent's name, running user, description, and tone — the foundation that the agent's instructions and welcome message build on. When you finish, Agentforce Builder opens your new agent in Canvas view.
 
 ### Canvas Step 2: Define the Variables
 
@@ -531,17 +521,17 @@ Open the Variables panel and create the variables that the agent uses to remembe
 - Identity: `member_name`, `member_email`, `member_number`, `verification_code`, `user_verification_code`, and a `verified` boolean (default False).
 - Orders: `order_id` and an `order_summary` string (default empty).
 
-The `verified` boolean and `order_summary` string are the variables that later gate which subagents and actions the agent can use. See [Manage Variables](https://help.salesforce.com/s/articleView?id=ai.agent_builder_variables.htm&type=5).
+The `verified` boolean and `order_summary` string are the variables that later gate which subagents and actions the agent can use. See [Manage Variables](https://help.salesforce.com/s/articleView?id=ai.agent_builder_variables.htm\&type=5).
 
 ### Canvas Step 3: Build the Router
 
-The router is your start subagent — the agent's entry point on every customer message. In _actions available for reasoning_, add two transition utilities: one to the Identity subagent, one to Order Management. Use a filter (Make this action available when:) so the transition to Identity is available only when `verified` equals False, and the transition to Order Management only when `verified` equals True. This ensures customers verify their identity before they can look up orders.
+The router is your start subagent — the agent's entry point on every customer message. In *actions available for reasoning*, add two transition utilities: one to the Identity subagent, one to Order Management. Use a filter (Make this action available when:) so the transition to Identity is available only when `verified` equals False, and the transition to Order Management only when `verified` equals True. This ensures customers verify their identity before they can look up orders.
 
 > *[Image removed — see online documentation]*
 
 ### Canvas Step 4: Build the Identity Subagent
 
-Add a subagent named **Identity** to verify the customer before any order data is exposed. Add the `send_verification_code` and `validate_verification_code` actions (both backed by flows) to _actions available for reasoning_. In the reasoning instructions, use the inline action shortcuts (`/`) to run the send action and store its outputs in variables, and reference the actions as resources (`@`) so the agent validates the code the customer enters. Add a transition to Order Management, available only when `verified` equals True.
+Add a subagent named **Identity** to verify the customer before any order data is exposed. Add the `send_verification_code` and `validate_verification_code` actions (both backed by flows) to *actions available for reasoning*. In the reasoning instructions, use the inline action shortcuts (`/`) to run the send action and store its outputs in variables, and reference the actions as resources (`@`) so the agent validates the code the customer enters. Add a transition to Order Management, available only when `verified` equals True.
 
 > *[Image removed — see online documentation]*
 
@@ -553,8 +543,6 @@ Add a subagent named **Order Management** to look up order details. Add the `loo
 
 ### Canvas Step 6: Preview and Test
 
-In Canvas view, select **Preview** and start a conversation, such as _I need help with my order_. Confirm that the agent asks you to verify your identity first, and that order details return correctly after verification.
-
+In Canvas view, select **Preview** and start a conversation, such as *I need help with my order*. Confirm that the agent asks you to verify your identity first, and that order details return correctly after verification.
+:::
 :::::
-
-::::::

@@ -23,10 +23,12 @@ If you're following along with the instructions and your org runs into unexpecte
 :::
 
 1. Log into the Salesforce Developer Edition org.
+
 2. From **Setup**, in the Quick Find box, enter `einstein setup`, and then select **Einstein Setup** and **Turn on Einstein**.
    > *[Image removed — see online documentation]*
 
 3. Search for **Agentforce Agents** and open it.
+
 4. Turn on **Agentforce**.
    > *[Image removed — see online documentation]*
 
@@ -49,6 +51,7 @@ We’re going to store most of our data in the Product2 object. Let’s start by
    2. **Label**: Color
    3. **Values**: Black, White, Brown, Grey, Navy, Beige, Green, Red, Oak, Walnut
    4. On the field-level security screen, check **Visible** for your profile
+
 4. Create the Weight (kg) custom field with the following settings, then save the field.
    1. **Field Type**: Number
    2. **Label**: Weight (kg)
@@ -68,7 +71,7 @@ For the rest of this section, you need to download and install Salesforce CLI: [
 sf org login web --alias your-org-alias
 ```
 
-2. Download this import-ready version of our product data: [Link](https://resources.docs.salesforce.com/rel1/doc/en-us/static/misc/product2_import.csv). Import the inventory data to Product2 using the command below. Replace `/full/path/to/product2_import.csv` with the direct path to import-ready .csv file.
+2. Download this import-ready version of our product data: [Link](https://resources.docs.salesforce.com/rel1/doc/en-us/static/misc/product2\_import.csv). Import the inventory data to Product2 using the command below. Replace `/full/path/to/product2_import.csv` with the direct path to import-ready .csv file.
 
 ```bash
 sf data import bulk --sobject Product2 --file /full/path/to/product2_import.csv --target-org your-org-alias --wait 10 --line-ending CRLF
@@ -106,6 +109,7 @@ sf data import bulk --sobject PricebookEntry --file /full/path/to/pricebook_entr
 ### Verify Data Was Imported
 
 1. From the App Launcher, enter `products`, then select the **Products** app.
+
 2. Change the **List View** to **All Products**. You should see 100 furniture entries.
    > *[Image removed — see online documentation]*
 
@@ -125,6 +129,7 @@ Now we need to create the custom Apex class our agent will be using to process c
    > *[Image removed — see online documentation]*
 
 2. Click **New**.
+
 3. Add the Apex code. See full code below.
    > *[Image removed — see online documentation]*
 
@@ -264,11 +269,14 @@ Now it’s time to build our agent, a custom subagent, and a custom action. The 
    > *[Image removed — see online documentation]*
 
 2. Click **New Agent**.
+
 3. Select the **Agentforce Service Agent** template.
    > *[Image removed — see online documentation]*
 
 4. Give your agent a name, like “Furniture Helper Agent”.
+
 5. Select **New User** for the agent user record.
+
 6. Click **Let’s Go**.
    > *[Image removed — see online documentation]*
 
@@ -278,7 +286,9 @@ Now it’s time to build our agent, a custom subagent, and a custom action. The 
    > *[Image removed — see online documentation]*
 
 2. Give it a **Subagent Name**, like “Search Inventory”.
+
 3. Give it a **Description**, like “Handle all questions about products, furniture, inventory, pricing, colors, and availability.”
+
 4. Give it **Reasoning Instructions**, like:
    “You MUST call the 'Search Furniture Inventory' action for every product-related question. Pass the relevant category, color, and maxPrice values from the user's message. Do not respond until you have received results from the action. If the action returns no results, tell the user no matching products were found.”
 
@@ -292,6 +302,7 @@ The subagent must explicitly instruct the agent to call an action, otherwise the
    > *[Image removed — see online documentation]*
 
 2. Give it an **Action Name**, like “Search Furniture Inventory”.
+
 3. Give it a **Description,** like “Searches the furniture inventory by category, color, and max price.”
 
 :::note
@@ -299,7 +310,9 @@ The description is very important because the agent uses it to decide if it shou
 :::
 
 4. For **Reference Action Type**, select **Apex**.
+
 5. **Reference Action Category** should be **Invocable Method**.
+
 6. For **Reference Action**, select the Apex action we created (**Search Furniture Inventory**) and click **Create and Open**.
    > *[Image removed — see online documentation]*
 
@@ -307,30 +320,34 @@ The description is very important because the agent uses it to decide if it shou
 
 ## Step 5: Give Your Agent User the Correct Permissions
 
-In order for our agent to access both our inventory data and the custom Apex class, we need to give its agent user permissions in our org. Without those permissions, the agent isn’t allowed to see into our data or run any special code. See [Best Practices for Agent User Permissions](https://help.salesforce.com/s/articleView?id=ai.agent_user.htm&type=5) for more information.
+In order for our agent to access both our inventory data and the custom Apex class, we need to give its agent user permissions in our org. Without those permissions, the agent isn’t allowed to see into our data or run any special code. See [Best Practices for Agent User Permissions](https://help.salesforce.com/s/articleView?id=ai.agent_user.htm\&type=5) for more information.
 
 ### Grant Object and Field Permissions
 
 1. From Setup, in the Quick Find box, enter `permission sets`, and then select **Permission Sets**.
    > *[Image removed — see online documentation]*
 
-2. From the list, look for **Agentforce Agent [your agent name] Permissions** and open it. For this example, the permission set is named **Agentforce Agent Furniture_Helper_Agent Permissions**.
+2. From the list, look for **Agentforce Agent \[your agent name] Permissions** and open it. For this example, the permission set is named **Agentforce Agent Furniture_Helper_Agent Permissions**.
    > *[Image removed — see online documentation]*
 
 3. Select **Object Settings**.
    > *[Image removed — see online documentation]*
 
 4. Scroll down the list until you find one of the objects your agent needs and open it. For this example, we need objects with the API names **Product2**, **PricebookEntry**, and **Pricebook2**.
+
 5. Click **Edit**, then check **Read** under **Object Permissions**, and **Read Access** for all **Field Permissions**.
    > *[Image removed — see online documentation]*
 
 6. Repeat for all necessary objects.
+
 7. Click **Save**.
 
 ### Grant Custom Apex Class Permissions
 
 1. Return to your custom Apex class.
+
 2. Click **Security**.
+
 3. Highlight your Einstein Agent User profile in **Available Profiles** and click **Add** so it moves to the **Enabled Profiles** list.
    > *[Image removed — see online documentation]*
 
@@ -338,13 +355,16 @@ In order for our agent to access both our inventory data and the custom Apex cla
 
 ## Step 6: Test Your Agent
 
-Always test your agent thoroughly before activating it and making it available to your customers. Agenforce Builder has a suite of advanced testing features to ensure your agent behaves consistently, responsibly, and helpfully. See [Preview and Test in Agentforce Builder](https://help.salesforce.com/s/articleView?id=ai.agent_preview_and_test.htm&type=5) for more information.
+Always test your agent thoroughly before activating it and making it available to your customers. Agenforce Builder has a suite of advanced testing features to ensure your agent behaves consistently, responsibly, and helpfully. See [Preview and Test in Agentforce Builder](https://help.salesforce.com/s/articleView?id=ai.agent_preview_and_test.htm\&type=5) for more information.
 
 1. Return to your agent in **Agentforce Builder**.
+
 2. Click **Preview** at the top of the canvas.
+
 3. Change **Simulate** to **Live Test Mode**.
+
 4. Ask your agent questions about the furniture inventory and evaluate the results.
-   - For example, try asking “What chairs do you have under \$400 that are white or grey?”
+   - For example, try asking “What chairs do you have under $400 that are white or grey?”
    - You can see the agent’s reasoning process in the **Interaction Summary** column.
      > *[Image removed — see online documentation]*
 
@@ -355,6 +375,7 @@ Always test your agent thoroughly before activating it and making it available t
 Once our agent is ready, we need to save our work and finalize the agent version. When we click **Commit Version**, we’re locking in the current state of the agent as version complete. Future changes will require us to create a new version, leaving the previous version intact in case we ever need to go back to it. After that, we’re ready to activate our agent and make it available to our customers.
 
 1. In your agent in Agentforce Builder, click **Save**.
+
 2. Click **Commit Version**, then click **Commit Version** again. You’ll need to create a new version to make further changes to your agent.
    > *[Image removed — see online documentation]*
 
