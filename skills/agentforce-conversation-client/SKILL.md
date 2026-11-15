@@ -12,13 +12,21 @@ description: >-
   Client App (ECA) OAuth setup, trusted domains, access token + frontdoor URL
   generation, getting the Employee Agent ID, embedAgentforceClient()
   initialization, rendering modes (floating/inline), style tokens, custom
-  images, and the open/close/execute panel API.
+  images, and the open/close/execute/reset panel API.
 metadata:
-  version: "1.0"
+  version: "1.1"
 ---
 
 <!--
 Changelog
+1.1 — Gap fill against the tracked doc snapshots (2026-11-15; upstream unchanged
+      since the 2026-11-06 baseline): added lightning/accApi reset(); flagged the
+      client-credentials vs Lightning Out 2.0 auth-flow conflict; added UI Bridge
+      frontdoor rules (1-minute single-use, My Domain only, web/full scope, no API
+      Only User, error codes); linked related skills (source:
+      tools/doc-refresh/snapshots/agentforce-conversation-client/platform/accsdk/guide/acc-api.md,
+      .../acc-developer-guide.md, .../acc-get-started.md,
+      .../help/platform.lightning_out_auth.md, .../help/xcloud.frontdoor_singleaccess.md).
 1.0 — Imported into essential-skills (2026-11-06) from the personal
       ~/.claude/skills copy. Doc sources tracked by tools/doc-refresh.
 -->
@@ -39,10 +47,19 @@ before writing any code — they share almost nothing.
 | If the goal is… | Use | Read |
 |---|---|---|
 | Embed an Employee Agent chat into an **external** web app hosted **outside** Salesforce (React, Vue, Angular, plain JS…) | **ACC Web SDK** (`@salesforce/agentforce-conversation-client`) | `references/web-sdk-setup.md` then `references/web-sdk-integrate.md` |
-| Programmatically **open/close** or **send utterances** to the **native Agentforce side panel** from a custom LWC **inside** Salesforce Lightning | **ACC API** (`lightning/accApi`) | `references/acc-api.md` |
+| Programmatically **open/close**, **send utterances** to, or **reset** the **native Agentforce side panel** from a custom LWC **inside** Salesforce Lightning | **ACC API** (`lightning/accApi`) | `references/acc-api.md` |
 
 **Do NOT use the ACC Web SDK** for purely headless agent integrations (SMS,
 WhatsApp, custom native mobile). ACC provides UI; headless channels don't need it.
+
+Related skills:
+
+- **React app deployed on Salesforce** (a Multi-Framework UIBundle, built with
+  Agentforce Vibes / Lightning Out 2.0): use `sf-multiframework-development`.
+  This skill covers apps hosted **outside** Salesforce.
+- **Custom rich UI inside the conversation**: ACC renders standard and custom
+  Lightning Types for agent action input/output automatically. To build your own,
+  use `clt-agentforce-actions`.
 
 ## ACC Web SDK — high-level workflow
 
@@ -57,10 +74,14 @@ an admin prerequisite** and must be done before the frontend code will work.
      (`client_secret`).
    - Get the **18-character Employee Agent ID** (`agentId`).
 2. **Auth flow (backend)** — see `references/web-sdk-setup.md`:
-   - Exchange client credentials for an `access_token`.
-   - Use the token to generate a short-lived **frontdoor URL**
-     (`/services/oauth2/singleaccess`). This becomes the `frontdoorUrl` you pass
-     to the SDK. **Do this server-side** — never hardcode tokens/frontdoor URLs
+   - Get an `access_token` with the `web` scope. The ACC guide shows the client
+     credentials flow, but the Lightning Out 2.0 docs say that flow isn't supported
+     (it has no user context, so the `web` scope is removed). If `singleaccess`
+     returns `Invalid_Scope`, use the web server or JWT bearer flow instead.
+   - Use the token to generate a **frontdoor URL**
+     (`/services/oauth2/singleaccess` on your **My Domain**). It is valid for
+     up to **1 minute** and works once. This becomes the `frontdoorUrl` you pass to
+     the SDK. **Do this server-side**, and never hardcode tokens or frontdoor URLs
      in client code.
 3. **Frontend integration** — see `references/web-sdk-integrate.md`:
    - `npm install @salesforce/agentforce-conversation-client`
@@ -95,9 +116,10 @@ Inside Salesforce Lightning Experience (desktop only), a custom LWC can drive th
 native side panel:
 
 ```javascript
-import { open, close, execute } from "lightning/accApi";
+import { open, close, execute, reset } from "lightning/accApi";
 
 await open(botId);                 // botId optional; opens last-used agent if omitted
+await reset();                     // optional: clear history, start a new conversation (docs-only, untested)
 await execute("Summarize this Account", botId);
 await close();
 ```
@@ -115,8 +137,9 @@ never `c__cid`, and never in an iframe).
   hardcode OAuth tokens or frontdoor URLs in client-side code — they can be
   scraped from the browser. Pass credentials to the browser only when strictly
   necessary.
-- **Frontdoor URLs are short-lived** — regenerate a new one to refresh the
-  session.
+- **Frontdoor URLs last up to 1 minute and work once.** Generate one right
+  before embedding, and a new one to refresh the session. The token user can't
+  have the API Only User permission.
 - **`agentId` is required** in every Web SDK configuration.
 - **Style tokens & config props change frequently** — verify current token names
   and properties against the

@@ -75,6 +75,15 @@ curl --location 'https://<your-salesforce-org>/services/oauth2/token' \
   --data-urlencode 'client_secret=<client_secret>'
 ```
 
+> **Docs conflict, not verified in an org.** The ACC guide shows the client
+> credentials flow above. The Lightning Out 2.0 auth article (which ACC is built
+> on) says the client credentials flow **isn't supported**: the flow has no user
+> context, so Salesforce removes the `web` scope from its token. Lightning Out 2.0
+> supports flows that give a web-scoped token with user context: the **web server
+> (authorization code) flow** and the **JWT bearer flow** (for JWT bearer, also
+> add the `refresh_token` scope to the ECA). If `singleaccess` returns
+> `Invalid_Scope` for a client-credentials token, switch to one of those flows.
+
 ## 4. Generate a Frontdoor URL (the SDK's `authCredential`)
 
 Frontdoor URLs bridge an existing session into a UI session without re-entering
@@ -110,6 +119,32 @@ const getFrontdoorUrl = async (accessToken, instanceUrl) => {
 ```
 
 Reference: [Generate a frontdoor URL to Bridge into UI Sessions](https://help.salesforce.com/s/articleView?id=xcloud.frontdoor_singleaccess.htm&type=5)
+
+### UI Bridge (`singleaccess`) rules
+
+From the UI Bridge help article:
+
+- **Lifetime**: the `frontdoor_uri` is valid for **up to 1 minute** and is
+  **single-use**. Repeat requests in that window return the same URL and don't
+  extend it. Generate it just before calling `embedAgentforceClient()`, not at
+  page build time or in a cache.
+- **Host**: call your **My Domain** (or Experience Cloud site) URL. Hosts such as
+  `login.salesforce.com` and `test.salesforce.com` return `No_Access`.
+- **Token**: the token must have the `web` or `full` scope, and it must come from
+  the same org you call (otherwise `Wrong_Org`). For POST, send it in the
+  `Authorization: Bearer` header (as above) or as an `access_token` body parameter.
+- **User**: the user behind the token **can't have the API Only User
+  permission** (otherwise `Bad_OAuth_Token`).
+- **No `redirect_uri`** is needed for embedding.
+
+| Error | Meaning / fix |
+|---|---|
+| `Bad_OAuth_Token` | Token invalid or expired (get a new one), or the user has API Only User |
+| `Missing_OAuth_Token` | No token in the header or body |
+| `Invalid_Scope` | Token lacks the `web` or `full` scope: fix the ECA scopes or the OAuth flow (see the note in step 3) |
+| `Invalid_Param` | `redirect_uri` isn't a relative path |
+| `No_Access` | Sent to `login.`/`test.salesforce.com`: use My Domain |
+| `Wrong_Org` | Token issued by a different org than the host |
 
 ### Authentication management (security)
 

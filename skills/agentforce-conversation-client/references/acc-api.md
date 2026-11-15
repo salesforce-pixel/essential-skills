@@ -5,7 +5,8 @@ inside the Salesforce Lightning desktop interface. It's a headless LWC module
 (`lightning/accApi`) that routes app-to-panel messages between custom LWC
 components and the Agentforce panel.
 
-Capabilities: open/close a panel, and execute utterances.
+Capabilities: open/close a panel, execute utterances, and reset the panel
+(clear the conversation history and start a new conversation).
 
 > This is a different integration from the ACC Web SDK. Use the API for control
 > of the panel **inside Salesforce**; use the Web SDK to embed ACC into
@@ -27,7 +28,7 @@ Capabilities: open/close a panel, and execute utterances.
 ## Get started
 
 ```javascript
-import { open, close, execute } from "lightning/accApi";
+import { open, close, execute, reset } from "lightning/accApi";
 ```
 
 If you don't have a custom LWC yet, initialize one via the
@@ -96,11 +97,30 @@ async askForSummary() {
 }
 ```
 
+### `reset(): Promise<void>`
+
+Clears the conversation history and starts a new conversation in the default
+Agentforce panel; resolves once the panel is reset. No parameters.
+
+```javascript
+import { reset } from "lightning/accApi";
+
+async handleResetPanel() {
+  await reset();
+}
+```
+
+> **Docs only, not yet tested in an org.** `reset()` takes no `botId`, and the
+> docs don't say which agent's conversation it clears when several agents are
+> in use, or whether it works with the Coworker (`SearchAgent`) side-panel agent.
+> To start a fresh conversation before an `execute`, call
+> `await reset()` first (calls are queued in order), then check the result in the org.
+
 ### Full component example
 
 ```javascript
 import { LightningElement } from "lwc";
-import { open, close, execute } from "lightning/accApi";
+import { open, close, execute, reset } from "lightning/accApi";
 
 export default class CustomAgentforceLauncher extends LightningElement {
   async handleOpenChat() {
@@ -114,6 +134,10 @@ export default class CustomAgentforceLauncher extends LightningElement {
   async handleSendMessage() {
     const utterance = "What is my account balance?";
     await execute(utterance, botId);
+  }
+
+  async handleResetChat() {
+    await reset();
   }
 }
 ```
@@ -134,8 +158,10 @@ export default class CustomAgentforceLauncher extends LightningElement {
   overlap when multiple agents are active in the same org.
 - **No return data**: `execute` does not return the agent's textual response to
   your component.
-- **Async**: `open`, `close`, and `execute` must be handled with standard
-  Promise patterns.
+- **Async**: `open`, `close`, `execute`, and `reset` must be handled with
+  standard Promise patterns.
+- **Upstream example bug**: the official `execute` snippet is cut off at a bare
+  `await`. The call is `await execute(utterance, botId)`, as shown above.
 
 ## Look up the `botId` by agent API name (no hardcoded Ids)
 
