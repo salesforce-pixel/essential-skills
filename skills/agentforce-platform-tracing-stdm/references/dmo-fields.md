@@ -170,4 +170,6 @@ Category `ENGAGEMENT`, created as Custom. ⚠ Id and name values are stored **wi
 
 Also present but unexplored: `AiAgentSessionLog_std__dlm`, `AiAgentTagAssocLog_std__dlm`, `AiAgentGenerativeAiUsage_std__dlm` (the DMO counterpart of the metering DLO above; not queried), `AiAgentMessageAttachment_std__dlm`, `AiAgentSessionAttachment_std__dlm`.
 
+Feedback, Trust Layer, RAG-quality and platform-span objects documented in Help but not checked here: `docs-only-dmos.md`.
+
 Finding DLO names: `d360_dlo_list` returns 20 objects per call whatever `limit` says; page with `offset`.

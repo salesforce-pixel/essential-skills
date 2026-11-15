@@ -1,12 +1,21 @@
 ---
 name: agentforce-platform-tracing-stdm
-description: Build and run Data 360 SQL over the Agentforce Session Trace Data Model (STDM) — the ssot__AiAgent* DMOs (Session, SessionParticipant, Interaction, InteractionMessage, InteractionStep) plus the Agent Analytics tag/moment DMOs — to monitor and debug any Agentforce agent. TRIGGER when the user asks to list or count agent sessions, read a conversation transcript, trace what an agent did in a turn (topic routing, actions, LLM calls, guardrails), find failing or slow steps, check action inputs/outputs, measure latency, review deflection/abandonment scores or request categories, link a MessagingSession to its agent session, measure an agent's LLM token usage (per version, model or prompt), count an agent's metered Agentforce actions or turn them into Flex Credits, or write any SQL against ssot__AiAgent*__dlm, GenAIGatewayRequest__dlm or AiAgentGenerativeAiUsage__dll. DO NOT TRIGGER for enabling or configuring session tracing itself (EventSettings / AgentforcePlatformTracingSettings metadata), for writing Agent Script (.agent) files, for website search-index SQL (hybrid_search / vector_search — use building-data360-semantic-queries), or for plain SOQL on CRM objects.
+description: Build and run Data 360 SQL over the Agentforce Session Trace Data Model (STDM) — the ssot__AiAgent* DMOs (Session, SessionParticipant, Interaction, InteractionMessage, InteractionStep) plus the Agent Analytics tag/moment DMOs — to monitor and debug any Agentforce agent. TRIGGER when the user asks to list or count agent sessions, read a conversation transcript, trace what an agent did in a turn (topic routing, actions, LLM calls, guardrails), find failing or slow steps, check action inputs/outputs, measure latency, review deflection/abandonment scores or request categories, link a MessagingSession to its agent session, measure an agent's LLM token usage (per version, model or prompt), count an agent's metered Agentforce actions or turn them into Flex Credits, measure Coworker adoption, compute Observability deflection/abandonment/escalation or Quality Score, join feedback, guardrail, RAG-quality or platform-trace spans to a trace, or write any SQL against ssot__AiAgent*__dlm, GenAI*__dlm, ssot__TelemetryTraceSpan__dlm or AiAgentGenerativeAiUsage__dll/_std__dlm. DO NOT TRIGGER for enabling or configuring session tracing itself (EventSettings / AgentforcePlatformTracingSettings metadata), for writing Agent Script (.agent) files, for website search-index SQL (hybrid_search / vector_search — use building-data360-semantic-queries), or for plain SOQL on CRM objects.
 metadata:
-  version: "1.0"
+  version: "1.1"
 ---
 
 <!--
 Changelog
+1.1 — Doc refresh (2026-11-15): 12 Help/developer pages added to the tracked sources.
+      Re-added the "About Agentforce Session Tracing" source. Added docs-only gotchas 15–18 (custom data space prefix, duplicate records,
+      Help now lists step TopicApiName/SubType APEX|FLOW|MCP, legacy vs standard GenAI
+      DMOs) and the CLOSED_TRANSFERRED end reason; Observability definitions of
+      deflection/abandonment/escalation/engagement/Quality Score + R13; Coworker
+      adoption R14; feedback, guardrail, retrieval-quality and platform-span joins
+      (references/docs-only-dmos.md); session tracing billing note. Org-verified
+      content unchanged (source: tools/doc-refresh/snapshots/agentforce-platform-tracing-stdm/help/*,
+      .../data/agentforce-coworker/guide/agentforce-coworker-query-usage-data.md).
 1.0 — Imported into essential-skills (2026-11-06) from the personal
       ~/.claude/skills copy. Doc sources tracked by tools/doc-refresh.
 -->
@@ -27,7 +36,7 @@ ssot__AiAgentSession__dlm (1 per session, Id = UUID like 01a158d3-…)
 
 Join keys: child `ssot__AiAgentSessionId__c` / `ssot__AiAgentInteractionId__c` → parent `ssot__Id__c`. Message → participant via `ssot__AiAgentSessionParticipantId__c`. Full verified field lists: `references/dmo-fields.md`. A real 3-turn trace of an Agent Script service agent, with every step: `references/example-trace.md`.
 
-Sources: Salesforce Help "About Agentforce Session Tracing", "Data Model for Agentforce Session Tracing", "Get Insights from Agent Session Tracing Data" (ai.generative_ai_session_trace_*). **Real orgs differ from those articles in several places; trust this skill and the DMO metadata (`d360_dmo_get`) over the Help field tables.** Everything below was verified against a live sandbox in October 2026; the token and metering parts (gotcha 9, R11, R12) in November 2026. Re-check with `d360_dmo_get` (DMOs) or `d360_dlo_get` (DLOs) if a field is missing in another org.
+Sources (all tracked in `tools/doc-refresh/sources.json`): the Data 360 DMO reference pages for `AiAgent*` / `GenAIGateway*`, and the Salesforce Help pages "About Agentforce Session Tracing", "Data Model for Agentforce Session Tracing", "Get Insights from Agentforce Session Tracing Data", "Agent Platform Tracing", "Billing Considerations for Agentforce Session Tracing", "Agentforce Observability Data Model", "Understand Quality Score", "Agentforce Observability Measure / Dimension Formulas", "Data Model for Generative AI Audit and Feedback", "Data Model for Knowledge/RAG Quality Data and Metrics", plus the developer guide page "Query Agentforce Coworker Usage and Adoption Data in Data 360". Sections marked **docs-only** come from those pages and haven't been run in an org; their DMO fields are in `references/docs-only-dmos.md`. **Real orgs differ from those articles in several places; trust this skill and the DMO metadata (`d360_dmo_get`) over the Help field tables.** Everything below that isn't marked docs-only was verified against a live sandbox in October 2026; the token and metering parts (gotcha 9, R11, R12) in November 2026. Re-check with `d360_dmo_get` (DMOs) or `d360_dlo_get` (DLOs) if a field is missing in another org.
 
 ## How to run the SQL
 
@@ -42,9 +51,9 @@ Always `SUBSTR(text, 1, N)` long text columns (`ssot__InputValueText__c` on LLM 
 
 ## Gotchas (verified in a sandbox, October–November 2026)
 
-1. **Use the `ssot__` DMO names.** The Help "Simple Query" example (`AiAgentSession__dlm`, `id__c`) doesn't work here. Use `ssot__AiAgentSession__dlm`, `ssot__Id__c`.
+1. **Use the `ssot__` DMO names:** `ssot__AiAgentSession__dlm`, `ssot__Id__c`. An older Help "Simple Query" used `AiAgentSession__dlm` / `id__c`, which doesn't work. The current Help examples use the `ssot__` names, but its field *tables* still list unprefixed names such as `Id__c` (see gotcha 2).
 2. **Real field names differ from the Help table.** Type fields carry the value directly and have no `Id` suffix: `ssot__AiAgentChannelType__c`, `ssot__AiAgentInteractionType__c`, `ssot__AiAgentInteractionStepType__c`, `ssot__AiAgentInteractionMessageType__c`, `ssot__AiAgentInteractionMsgContentType__c`, `ssot__AiAgentSessionParticipantRole__c`, `ssot__AiAgentType__c`. The messaging link is `ssot__RelatedMessagingSessionId__c` (voice: `ssot__RelatedVoiceCallId__c`).
-3. **Some fields have no `ssot__` prefix:** `SubType__c` (Step), `Modality__c`, `MessageStartTimestamp__c`, `MessageEndTimestamp__c` (Message). Step has **no** `TopicApiName` field here; use the interaction's.
+3. **Some fields have no `ssot__` prefix:** `SubType__c` (Step), `Modality__c`, `MessageStartTimestamp__c`, `MessageEndTimestamp__c` (Message). Step has **no** `TopicApiName` field here; use the interaction's. (The Help table now lists a step-level `TopicApiName__c` for multi-agent subagents: re-verify with `d360_dmo_get` before relying on it.)
 4. **Participant rows repeat per turn.** A 4-turn session has 4 USER and 4 AGENT rows, each with its own `ssot__Id__c`. Never join Participant straight into a session-level count. Reduce it first:
    ```sql
    WITH agent_sessions AS (
@@ -59,7 +68,8 @@ Always `SUBSTR(text, 1, N)` long text columns (`ssot__InputValueText__c` on LLM 
    - Real values test: `col IS NOT NULL AND col <> 'NOT_SET' AND LENGTH(col) > 0` (`SubType__c` has both NULL and `NOT_SET`).
 6. **Session end:** `ssot__AiAgentSession__dlm.ssot__EndTimestamp__c` is always NULL (deprecated), and `ssot__AiAgentSessionEndType__c` is always `NOT_SET`.
    - Use `MAX(interaction.ssot__EndTimestamp__c)` for the end time.
-   - Sessions that closed have a `SESSION_END` interaction and a `SESSION_END` step. **The step's `ssot__Name__c` is the end reason:** `CLOSED_USER_REQUEST` or `EXPIRED`.
+   - Sessions that closed have a `SESSION_END` interaction and a `SESSION_END` step. **The step's `ssot__Name__c` is the end reason:** `CLOSED_USER_REQUEST` or `EXPIRED` (seen in the org). The Observability formulas also use **`CLOSED_TRANSFERRED`** (transferred to another agent); that's how they detect an escalation.
+   - Agentforce Observability treats a session as **ended** when it has a `SESSION_END` interaction **or** no activity for 24 hours.
 7. **Turn counting:** the welcome message is its own `TURN` interaction with topic `NOT_SET` and only an Output message. Count user turns as interactions that have an `Input` message, or as `TURN`s with topic `<> 'NOT_SET'`.
 8. **Topic names carry the planner id:** `<Topic>_16j…` (e.g. `GeneralFAQ_16jXX0000000001`). Match with `LIKE 'GeneralFAQ%'`. Step `ssot__Name__c` holds the plain name (`GeneralFAQ`).
 9. **Token counts live in the LLM gateway DMO, not in the trace.** Step payloads and `GenAIGatewayResponse__dlm` have no token counts. `GenAIGatewayRequest__dlm` has one row per LLM call: `promptTokens__c`, `completionTokens__c`, `totalTokens__c`, `model__c`, `promptTemplateDevName__c`, `feature__c`, `plannerId__c`, `botVersionId__c`, `sessionId__c`, `timestamp__c`. Recipe R11.
@@ -79,6 +89,13 @@ Always `SUBSTR(text, 1, N)` long text columns (`ssot__InputValueText__c` on LLM 
     - Their action names look like `<Topic>_<plannerId>.<Action>_<id>`.
 13. **Row counts differ from MessagingSession.** STDM makes one session per agent invocation (`ssot__RelatedMessagingSessionId__c` = `MessagingSession.Id`, `0Mw…`).
 14. **Model per LLM call:** `LLM_STEP` `ssot__InputValueText__c` holds `"gen_ai.request.model":"<model>"`: the org default (e.g. `llmgateway__GPT41`), or the full `sfdc_ai__…` name when `model_config` overrides it (e.g. `sfdc_ai__DefaultBedrockAnthropicClaude55Sonnet`). Extract it with `SUBSTR(text, STRPOS(text, 'gen_ai.request.model') + 23, 60)` to compare models. Builder preview sessions are version `v0`, with topic `<Topic>_PlannerPreview-…`.
+
+Docs-only gotchas (from the Help pages; not yet checked in an org):
+
+15. **Custom data space prefix.** In the `default` data space fields start with `ssot__`. In a custom data space, the Help says to replace `ssot__` with that space's prefix (e.g. `std__`), and pass that `dataspace` to `d360_query_sql`.
+16. **Duplicate records are possible.** Data 360 streaming and Agentforce use at-least-once delivery, so the same logical record can arrive twice. The session and turn counts here already use `COUNT(DISTINCT …)`. **R4, R6, R11 and R12 don't**: they `COUNT(*)` or `SUM` step, gateway and metering rows, so a duplicate would inflate errors, latency samples, tokens and Flex Credits. Before quoting a total, check `COUNT(*)` against `COUNT(DISTINCT <primary key>)` (`ssot__Id__c`, `gatewayRequestId__c`, `id__c`). Check a session for duplicate participants by comparing message `ssot__AiAgentSessionParticipantId__c` values with the participant `ssot__Id__c` values. This is separate from gotcha 4, where one participant row per turn is the normal shape.
+17. **Help step `SubType__c` examples are `APEX`, `FLOW`, `MCP`.** The verified org showed `generatePromptResponse` and `standardInvocableAction`. Group by the column before filtering on a value.
+18. **`GenAI*__dlm` objects are the legacy custom DMOs** of Audit and Feedback (no `ssot__` prefix). Salesforce says future schema changes go only to the **standard** DMOs (`GenAiGatewayRequest_std__dlm`, `GenAiResponseGeneration_std__dlm`, `GenAiFeedback…`). R11 was verified on the legacy `GenAIGatewayRequest__dlm`. If a field disappears there, move to the standard DMO and re-check its field names with `d360_dmo_get`. The DMO reference confirms the standard names (`GenAiGatewayRequest_std__dlm`, `GenAiGatewayResponse_std__dlm`, `GenAiGatewayRequestTag_std__dlm`, `GenAiGatewayReqObjRec_std__dlm`, …). Standard DMOs **exist only after you map them** on the data mapping screen, so "table does not exist" can just mean the DMO isn't mapped yet.
 
 ## Value vocabularies (seen in the verified org; others may add values)
 
@@ -125,7 +142,7 @@ Step payloads (JSON text):
 
 ## Recipes
 
-Replace `<Agent_API_Name>` (the agent's API name, e.g. `My_Service_Agent`; list them with R9) and the ids with your own values. Every recipe below ran successfully against a live org.
+Replace `<Agent_API_Name>` (the agent's API name, e.g. `My_Service_Agent`; list them with R9) and the ids with your own values. Every recipe below ran successfully against a live org, except R13 and R14, which are marked docs-only.
 
 ### R1. Recent sessions for an agent, with turns and duration
 ```sql
@@ -269,6 +286,58 @@ GROUP BY 1,2,3 ORDER BY 1,3
 - These come from Agent Analytics/Optimization batch jobs, so they lag behind the raw trace by hours.
 - `AiAgentTag` isn't SOQL-queryable; use the DMO.
 
+**How Agentforce Observability turns these into rates (docs-only).** The dashboards come from the semantic model **Agentforce Analytics Foundations** (Data 360 → semantic model tab). Its `_clc` calculated fields define:
+
+| Metric | Definition |
+|---|---|
+| Engaged session | Has at least one interaction with a user message. Rates below divide by engaged sessions |
+| Escalated (`Escalation_Status_clc`) | Session has a `SESSION_END` step named `CLOSED_TRANSFERRED` (ended = `SESSION_END` or 24 h idle) |
+| Deflected | Not escalated **and** the **latest** Deflection Score is **4 or 5** |
+| Abandoned | Not escalated **and** latest Abandonment Score is `TRUE` **and** latest Deflection Score is ≤ 3 or missing |
+| Latest score | The tag association with the newest created date per session and tag definition (scores can be re-run) |
+| Step with error | `ErrorMessageText` not NULL, not blank, not `NOT_SET`, not `None`, and not a `"message":"None"` + `"source":"mgr.step.error"` placeholder |
+| Success rate | Turns with an action step and no error step ÷ turns |
+| Turn completion rate | User turns with an agent response within 60 s ÷ user turns |
+| Session duration | Ended sessions only: first `TURN` start to last `TURN` end |
+
+**Quality Score** (tag definition `Quality_Score`): an LLM judge rating each moment 1–5. A failed P0 check (relevance, consistency) gives 1; P1 (effective, uses context, trusted, teachable, decisive) gives 2; P2 (specific, responsive) gives 3; P3 (conversational, consistent tone, approachable, helpful; redirecting to another team counts here) gives 4; all passed gives 5. The calculation changed on **August 15**, so don't compare trends across that date. To change the criteria, clone the scorer in Prompt Builder, because you can't edit the standard one. To change a metric's logic, edit the **Service Agent / Employee Agent Analytics Extension** semantic model instead of the standard one.
+
+### R13. Deflection, abandonment and escalation per session (docs-only, not yet run)
+Applies the definitions above with the verified tag joins from R8. Check one session against the Agent Analytics UI before you trust the rates.
+```sql
+WITH agent_sessions AS (
+  SELECT DISTINCT ssot__AiAgentSessionId__c AS sid FROM ssot__AiAgentSessionParticipant__dlm
+  WHERE ssot__AiAgentApiName__c = '<Agent_API_Name>' AND ssot__AiAgentSessionParticipantRole__c = 'AGENT'),
+scores AS (
+  SELECT a.ssot__AiAgentSessionId__c AS sid, d.ssot__DeveloperName__c AS def, t.ssot__Value__c AS val,
+         ROW_NUMBER() OVER (PARTITION BY a.ssot__AiAgentSessionId__c, d.ssot__Id__c
+                            ORDER BY a.ssot__CreatedDate__c DESC) AS rn
+  FROM ssot__AiAgentTagAssociation__dlm a
+  JOIN ssot__AiAgentTag__dlm t ON t.ssot__Id__c = a.ssot__AiAgentTagId__c
+  JOIN ssot__AiAgentTagDefinition__dlm d ON d.ssot__Id__c = t.ssot__AiAgentTagDefinitionId__c
+  WHERE d.ssot__DeveloperName__c LIKE 'std_Deflection_Score%' OR d.ssot__DeveloperName__c LIKE 'std_Abandonment_Score%'),
+per_session AS (
+  SELECT s.sid,
+         MAX(CASE WHEN sc.def LIKE 'std_Deflection_Score%'  AND sc.rn = 1 THEN sc.val END) AS deflection,
+         MAX(CASE WHEN sc.def LIKE 'std_Abandonment_Score%' AND sc.rn = 1 THEN UPPER(sc.val) END) AS abandonment,
+         MAX(CASE WHEN st.ssot__Name__c = 'CLOSED_TRANSFERRED' THEN 1 ELSE 0 END) AS escalated,
+         MAX(CASE WHEN m.ssot__AiAgentInteractionMessageType__c = 'Input' THEN 1 ELSE 0 END) AS engaged
+  FROM agent_sessions s
+  LEFT JOIN scores sc ON sc.sid = s.sid
+  LEFT JOIN ssot__AiAgentInteraction__dlm i ON i.ssot__AiAgentSessionId__c = s.sid
+  LEFT JOIN ssot__AiAgentInteractionStep__dlm st ON st.ssot__AiAgentInteractionId__c = i.ssot__Id__c
+  LEFT JOIN ssot__AiAgentInteractionMessage__dlm m
+    ON m.ssot__AiAgentInteractionId__c = i.ssot__Id__c AND m.ssot__AiAgentSessionId__c = s.sid
+  GROUP BY s.sid)
+SELECT COUNT(*) AS sessions, SUM(engaged) AS engaged,
+       SUM(CASE WHEN engaged = 1 AND escalated = 1 THEN 1 ELSE 0 END) AS escalated,
+       SUM(CASE WHEN engaged = 1 AND escalated = 0 AND deflection IN ('4','5') THEN 1 ELSE 0 END) AS deflected,
+       SUM(CASE WHEN engaged = 1 AND escalated = 0 AND abandonment = 'TRUE'
+                 AND (deflection IS NULL OR deflection NOT IN ('4','5')) THEN 1 ELSE 0 END) AS abandoned
+FROM per_session
+```
+Divide `deflected`, `abandoned` and `escalated` by `engaged` to get the rates. This query is wide (steps × messages per session), so add a date filter on the interactions for large agents. If `ROW_NUMBER() OVER` isn't accepted, take `MAX(ssot__CreatedDate__c)` per session and definition in a CTE and join back to it.
+
 ### R9. Volume by agent, channel and day
 ```sql
 WITH agent_sessions AS (
@@ -393,6 +462,8 @@ What the metering showed for an Agent Script service agent with one custom Apex 
 - Read Data 360 consumption in Setup → Digital Wallet instead.
 - Each query's result `status` includes `rowsProcessed` (one retriever `hybrid_search` query returning 8 passages processed 15,912 rows).
 
+**What session tracing itself costs (docs).** Agentforce Session Tracing no longer consumes Flex Credits or Data 360 Data Services credits. Its storage counts toward Digital Wallet **Data Storage → Storage Beyond Allocation**, so you pay only for storage over the allocation. Agent Platform Tracing (below) is separate, and the Help says turning it on increases credit consumption.
+
 ### R11. LLM tokens for an agent, per version, model and prompt
 ```sql
 WITH agent AS (
@@ -444,6 +515,61 @@ CROSS JOIN first_meter f
 WHERE st.ssot__AiAgentInteractionStepType__c = 'ACTION_STEP' AND (f.ts IS NULL OR st.ssot__StartTimestamp__c < f.ts)
 GROUP BY 1,2 ORDER BY 3 DESC
 ```
+
+### R14. Agentforce Coworker adoption (docs-only, not yet run)
+The developer guide queries the **standard DMO** `AiAgentGenerativeAiUsage_std__dlm` (the counterpart of the DLO above) and filters on `GenAiGatewayFeatureName__c`. The DMO reference page confirms that object name and the `GenAiGatewayFeatureName__c`, `FeatureDescriptorName__c`, `UserId__c` and `Timestamp__c` fields. The DMO must be mapped first (gotcha 18). In the verified DLO, `AgentforceCoworker` appeared in `featureDescriptorName__c`. If the filter returns nothing, group by both columns to see where the value is.
+```sql
+SELECT 'Last 7 days' AS period, COUNT(DISTINCT UserId__c) AS active_users, COUNT(*) AS requests
+FROM AiAgentGenerativeAiUsage_std__dlm
+WHERE GenAiGatewayFeatureName__c = 'AgentforceCoworker' AND Timestamp__c >= CURRENT_DATE - INTERVAL '7' DAY
+UNION ALL
+SELECT 'Last 30 days', COUNT(DISTINCT UserId__c), COUNT(*)
+FROM AiAgentGenerativeAiUsage_std__dlm
+WHERE GenAiGatewayFeatureName__c = 'AgentforceCoworker' AND Timestamp__c >= CURRENT_DATE - INTERVAL '30' DAY
+UNION ALL
+SELECT 'Last 90 days', COUNT(DISTINCT UserId__c), COUNT(*)
+FROM AiAgentGenerativeAiUsage_std__dlm
+WHERE GenAiGatewayFeatureName__c = 'AgentforceCoworker' AND Timestamp__c >= CURRENT_DATE - INTERVAL '90' DAY
+```
+- **Adoption rate** = `COUNT(DISTINCT UserId__c) * 100.0 / <licensed seats>`.
+- **Per user**: group by `UserId__c` with `COUNT(DISTINCT CAST(Timestamp__c AS DATE))` as active days.
+- **Per day**: group by `CAST(Timestamp__c AS DATE)`.
+- The DMO has user Ids, not names. Look the names up with SOQL on `User`. For a Data 360 report grouped by name, a data transform has to join it to the User DMO into a custom DMO, because Data 360 reports don't support joined reports.
+
+## Feedback, guardrails and retrieval quality (docs-only)
+
+These join to the trace through the LLM-call ids on `LLM_STEP` and guardrail steps. Field lists: `references/docs-only-dmos.md`.
+
+- **User feedback (thumbs up/down)**: step `ssot__GenAiGatewayRequestId__c` → `GenAIGatewayRequest__dlm.gatewayRequestId__c` → `generationGroupId__c` → `GenAIFeedback__dlm.generationGroupId__c`. `feedback__c` is `GOOD`/`BAD`/NULL, `action__c` is e.g. `thumbs-up`, `regeneration`. `GenAIFeedbackDetail__dlm` has the free-text reason. (`GenAIFeedback__dlm` had 0 rows in the verified org in October 2026.) Strip the gateway quotes (gotcha 9) before joining.
+  ```sql
+  SELECT st.ssot__AiAgentInteractionId__c AS interaction_id, st.ssot__Name__c AS step,
+         fb.feedback__c AS feedback, fb.action__c AS action, fb.timestamp__c AS at
+  FROM ssot__AiAgentInteractionStep__dlm st
+  JOIN GenAIGatewayRequest__dlm req ON st.ssot__GenAiGatewayRequestId__c = REPLACE(req.gatewayRequestId__c, '"', '')
+  JOIN GenAIFeedback__dlm fb ON REPLACE(req.generationGroupId__c, '"', '') = REPLACE(fb.generationGroupId__c, '"', '')
+  LIMIT 100
+  ```
+- **Trust Layer results** are in `GenAIContentCategory__dlm`. Filter on `detectorType__c`: `PII`, `TOXICITY`, `PROMPT_DEFENSE`, `InstructionAdherence` (`HIGH`/`LOW`/`UNCERTAIN`) or `TaskResolution` (`FULLY_RESOLVED`/`PARTIALLY_RESOLVED`/`UNRESOLVED`). `category__c` holds the category and `value__c` the value. The row links through `parent__c` to `GenAIContentQuality` or `GenAIGeneration` (step `ssot__GenerationId__c`). These are the same values as the `TRUST_GUARDRAILS_STEP` output text, but in rows you can count.
+- **Knowledge/RAG quality**: `AIRetrieverQualityMetric` scores each retrieval with `AnswerRelevancyScoreNumber__c` (did it answer?), `ContextPrecisionScoreNumber__c` (did it find the right knowledge?) and `FaithfulnessRelevancyScoreNumber__c` (did the agent use it?). It also stores `RetrieverApiName__c`, `UserUtteranceText__c` and `SourceDocumentIdListText__c`. It joins to the gateway request through `AiGatewayRequestId__c`, and to platform spans through `RetrieverTraceId__c` / `RetrieverTraceSpanId__c`. The raw `AIRetrieverRequest` / `AIRetrieverResponse` DLOs hold the query, the chunks and the session or trace id. Look up the exact object names in the org first, because the Help doesn't give the `__dlm` suffix.
+
+## Agent Platform Tracing spans (docs-only)
+
+A separate Setup toggle (Einstein Generative AI → Einstein Audit, Analytics, and Monitoring Setup → **Agent Platform Tracing**; it requires Session Tracing). It collects OpenTelemetry-style spans every 5 minutes from Apex, Flows, Prompt Builder, Invocable Actions, Planner, AI Gateway, LLM Gateway and the DC Query Federator. It isn't supported on Government Cloud.
+
+- Data lands in the DLO `ObservabilitySpans__dll` and the DMO **`ssot__TelemetryTraceSpan__dlm`**, in the data space set in Auditing & Monitoring.
+- The DMO's fields are `ssot__Id__c` (span), `ssot__TelemetryTrace__c` (trace), `ssot__TelemetryParentSpanId__c`, `ssot__ServiceName__c`, `ssot__OperationName__c`, `ssot__StartDateTime__c`, `ssot__EndDateTime__c`, `ssot__DurationNumber__c` (nanoseconds), `ssot__StatusCode__c`, `ssot__TelemetrySpanAttributeText__c` and `ssot__TelemetrySpanEventText__c`. The Help's data-type column for this DMO is shuffled, so check the types with `d360_dmo_get`.
+- **Join to STDM**: span `ssot__TelemetryTrace__c` = interaction `ssot__TelemetryTraceId__c` (the Help's report relationship is "Telemetry Trace Span → ManyToOne → AI Agent Interaction" on Telemetry Trace).
+- One turn is a tree. The root is `run.interaction`, with children such as `run.topic.<Topic>`, `run.llmstep`, `run.action.<Action>`, `run.invokeActions.<…>` [InvocableAction], `run.<template>` [PromptTemplate] (`resolve_template`, `mask_template`, `generation` steps), `run.retriever.<retriever>` and `run.hybridsearch.<index>__dlm` [Data Cloud]. Use spans to see **inside** an `ACTION_STEP`, for example how much of a slow prompt-template action was retrieval and how much was generation.
+```sql
+SELECT sp.ssot__ServiceName__c AS service, sp.ssot__OperationName__c AS operation,
+       sp.ssot__Id__c AS span_id, sp.ssot__TelemetryParentSpanId__c AS parent_span,
+       sp.ssot__DurationNumber__c / 1000000 AS ms, sp.ssot__StatusCode__c AS status
+FROM ssot__AiAgentInteraction__dlm i
+JOIN ssot__TelemetryTraceSpan__dlm sp ON sp.ssot__TelemetryTrace__c = i.ssot__TelemetryTraceId__c
+WHERE i.ssot__AiAgentSessionId__c = '<session-id>'
+ORDER BY sp.ssot__StartDateTime__c
+```
+Data 360 reports on spans show up to 2,000 rows in run mode, and you can export up to 50,000.
 
 ## Bridging to CRM records (SOQL)
 

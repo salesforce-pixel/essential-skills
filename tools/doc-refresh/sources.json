@@ -104,7 +104,21 @@
       "skill_dir": "skills/agentforce-platform-tracing-stdm",
       "sources": [
         { "index": "https://developer.salesforce.com/docs/llms-data-cloud.txt",
-          "match": "^data/data-cloud-dmo-mapping/guide/c360dm-(si-(aiagent|genaigateway)[a-z]+-dmo|aiagent[a-z]+_dmo_mappings)$" }
+          "match": "^data/data-cloud-dmo-mapping/guide/c360dm-(si-(aiagent|genaigateway)[a-z]+-dmo|aiagent[a-z]+_dmo_mappings)$" },
+        { "urls": [
+          "https://help.salesforce.com/s/articleView?id=ai.generative_ai_session_trace_about.htm&type=5",
+          "https://help.salesforce.com/s/articleView?id=ai.generative_ai_session_trace_data_model.htm&type=5",
+          "https://help.salesforce.com/s/articleView?id=ai.generative_ai_session_trace_use.htm&type=5",
+          "https://help.salesforce.com/s/articleView?id=ai.generative_ai_platform_trace.htm&type=5",
+          "https://help.salesforce.com/s/articleView?id=ai.generative_ai_session_trace_usage_types.htm&type=5",
+          "https://help.salesforce.com/s/articleView?id=ai.generative_ai_agentforce_observability_data_model.htm&type=5",
+          "https://help.salesforce.com/s/articleView?id=ai.generative_ai_understand_quality_score.htm&type=5",
+          "https://help.salesforce.com/s/articleView?id=ai.generative_ai_agent_analytics_measure_formulas.htm&type=5",
+          "https://help.salesforce.com/s/articleView?id=ai.generative_ai_agent_analytics_dimension_formulas.htm&type=5",
+          "https://help.salesforce.com/s/articleView?id=ai.generative_ai_feedback_data_model.htm&type=5",
+          "https://help.salesforce.com/s/articleView?id=ai.generative_ai_monitor_retrieval_data_model.htm&type=5",
+          "https://developer.salesforce.com/docs/data/agentforce-coworker/guide/agentforce-coworker-query-usage-data.md"
+        ] }
       ]
     },
 
