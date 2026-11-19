@@ -37,6 +37,31 @@
       "image_placeholder": "> *[Image removed — see online documentation]*"
     },
 
+    "agentforce-apis": {
+      "kind": "curated",
+      "skill_dir": "skills/agentforce-apis",
+      "sources": [
+        {
+          "urls": [
+            "https://developer.salesforce.com/docs/ai/agentforce/guide/agent-api-get-started.md",
+            "https://developer.salesforce.com/docs/ai/agentforce/guide/agent-api-agent-id.md",
+            "https://developer.salesforce.com/docs/ai/agentforce/guide/agent-api-lifecycle.md",
+            "https://developer.salesforce.com/docs/ai/agentforce/guide/agent-api-examples.md",
+            "https://developer.salesforce.com/docs/ai/agentforce/guide/agent-api-variables.md",
+            "https://developer.salesforce.com/docs/ai/agentforce/guide/agent-api-considerations.md",
+            "https://developer.salesforce.com/docs/ai/agentforce/guide/agent-api-troubleshooting.md",
+            "https://developer.salesforce.com/docs/ai/agentforce/guide/get-started-enhanced-chat.md",
+            "https://developer.salesforce.com/docs/ai/agentforce/guide/enhanced-chat-inline-mode.md",
+            "https://developer.salesforce.com/docs/ai/agentforce/guide/custom-connections.md",
+            "https://developer.salesforce.com/docs/ai/agentforce/guide/custom-connections-get-started.md",
+            "https://developer.salesforce.com/docs/ai/agentforce/guide/custom-connections-response-formats.md",
+            "https://developer.salesforce.com/docs/ai/agentforce/guide/custom-connections-troubleshooting.md",
+            "https://developer.salesforce.com/docs/ai/agentforce/guide/otel-api.md"
+          ]
+        }
+      ]
+    },
+
     "afagent-metadata-helper": {
       "kind": "curated",
       "skill_dir": "skills/afagent-metadata-helper",
