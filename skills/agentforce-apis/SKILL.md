@@ -2,9 +2,10 @@
 name: agentforce-apis
 description: >-
   Call and connect Agentforce agents from outside Salesforce: the headless Agent API
-  (REST on api.salesforce.com — External Client App + client-credentials token, agent ID
-  lookup, start session, sync and SSE streaming messages, agent variables, citations,
-  feedback, end session, errors), Enhanced Chat v2 for service agents (inline vs floating
+  (REST on api.salesforce.com — External Client App, client-credentials or per-user web
+  server flow + PKCE token, agent ID lookup, start session, sync and SSE streaming
+  messages, agent variables, citations, feedback, end session, errors; calling Employee
+  Agents, which have no agent user and need bypassUser false), Enhanced Chat v2 for service agents (inline vs floating
   display mode, targetElement, disableInlineAutoLaunch, setSessionContext context events),
   custom connections (AiSurface + AiResponseFormat metadata, plannerSurfaces in
   GenAiPlannerBundle, surfaceConfig, parsing SURFACE_ACTION__ results into native UI), and
@@ -13,7 +14,9 @@ description: >-
   client, Slack/Teams/mobile/IVR bridge or backend integration for an agent; asks about
   bypassUser, externalSessionKey, sequenceId, streamingCapabilities, chatbot_api /
   sfap_api scopes, TextChunk / Inform / EndOfTurn / ValidationFailureChunk events, HTTP
-  423 or EngineConfigLookupException; embeds Enhanced Chat v2 inline; writes AiSurface or
+  423, an empty HTTP 404, "Invalid user ID provided on start session" or
+  EngineConfigLookupException; asks whether every Agent API caller must be a Salesforce
+  user, guest access, or one ECA per user; embeds Enhanced Chat v2 inline; writes AiSurface or
   AiResponseFormat files; or exports a session trace to Datadog, Splunk, New Relic or an
   OTLP collector. DO NOT TRIGGER for embedding the Employee Agent UI in a web app or
   driving the Lightning side panel (use agentforce-conversation-client), Custom Lightning
@@ -21,11 +24,16 @@ description: >-
   agentforce-platform-tracing-stdm), writing .agent files (use agentscript), or
   retrieving/deploying agent metadata in general (use afagent-metadata-helper).
 metadata:
-  version: "1.0"
+  version: "1.1"
 ---
 
 <!--
 Changelog
+1.1 — Employee Agents over the Agent API (2026-11-20), from a live test on 2026-11-19: new
+      references/employee-agents.md (no guest access, empty 404 without a JWT, bypassUser
+      false required, shared Run As user vs per-user web server flow + PKCE on one ECA).
+      Corrected the bypassUser rule (a client-credentials token works with false).
+      agent_api_chat.py: --login web (PKCE, local callback) and new error hints.
 1.0 — New skill (2026-11-19), curated from the Agentforce Developer Guide pages on the
       Agent API, Enhanced Chat v2, custom connections and the Session Trace OTel API
       (doc sources tracked by tools/doc-refresh). Adds scripts/agent_api_chat.py.
@@ -39,6 +47,7 @@ write code; they share auth (an External Client App) but little else.
 | Goal | Use | Read |
 |---|---|---|
 | Talk to an agent from your own backend, bot bridge, test harness or app (no Salesforce UI) | **Agent API** (REST, `api.salesforce.com/einstein/ai-agent/v1`) | `references/agent-api.md` |
+| Call an **Employee Agent** through the Agent API; decide shared user vs per-user sign-in | **Agent API** with `bypassUser: false` (tested) | `references/employee-agents.md` |
 | Put a **service agent** on a website with Salesforce's chat widget, inline in the page or floating | **Enhanced Chat v2** (Embedded Service deployment snippet) | `references/enhanced-chat-v2.md` |
 | Your own chat client that renders agent replies as **native components** (carousels, pickers, forms) | **Custom connection** (`AiSurface` + `AiResponseFormat`) on top of the Agent API | `references/custom-connections.md` |
 | Pull one session's full trace (turns, LLM calls, actions, scores, feedback) into an observability tool | **Session Trace OTel API (beta)** | `references/otel-api.md` |
@@ -58,7 +67,8 @@ Querying many sessions with SQL → `agentforce-platform-tracing-stdm`.
 5. DELETE …/v1/sessions/{SESSION_ID}   header x-session-end-reason: UserRequest
 ```
 
-Start-session body (minimum that works with client credentials):
+Start-session body (minimum that works with client credentials on a **service agent**;
+an **Employee Agent** needs `"bypassUser": false`, see rule 5):
 
 ```json
 {
@@ -80,6 +90,8 @@ arguments or files. `--dry-run` prints the requests without sending anything.
 export SF_MY_DOMAIN=<mydomain>.my.salesforce.com SF_CLIENT_ID=… SF_CLIENT_SECRET=…
 python3 scripts/agent_api_chat.py --agent-id 0Xx… --stream "Where is my order?"
 python3 scripts/agent_api_chat.py --agent-id 0Xx…            # interactive; empty line ends
+python3 scripts/agent_api_chat.py --agent-id 0Xx… --as-token-user "Hi"   # Employee Agent, shared Run As user
+python3 scripts/agent_api_chat.py --agent-id 0Xx… --login web "Hi"       # sign in as yourself (PKCE; no secret)
 ```
 
 ## Rules that prevent most failures
@@ -88,18 +100,27 @@ python3 scripts/agent_api_chat.py --agent-id 0Xx…            # interactive; em
 2. **External Client App**: scopes `api`, `refresh_token offline_access`, `chatbot_api`,
    `sfap_api`; enable Client Credentials Flow **and** "Issue JWT-based access tokens for
    named users"; on the Policy tab enable client credentials again and set **Run As** to a
-   user with at least API Only access. Untick the three "Require secret / PKCE" boxes.
+   user with at least API Only access. Untick the three "Require secret / PKCE" boxes
+   (keep PKCE on for browser and mobile clients). Add a Callback URL if anyone will sign
+   in with the web server flow.
 3. **Two different hosts.** The token call and `instanceConfig.endpoint` use your **My
    Domain** URL (`*.my.salesforce.com`, not `*.lightning.force.com`). Every Agent API call
    goes to `api.salesforce.com`, or `api.gov.salesforce.com` on Government Cloud. The wrong
    My Domain gives `EngineConfigLookupException` (HTTP 500); the wrong API host gives 404.
+   **No token, or a token that isn't a JWT** (e.g. a CLI session ID `00D…!…`) also gives a
+   bare **404 with an empty body**, not a 401: the gateway can't tell which org the call
+   is for. There is no guest or anonymous access (tested 2026-11-19).
 4. **Agent ID.** New Agentforce Builder / Agent Script agents:
    `SELECT Id FROM BotDefinition WHERE DeveloperName = '<Agent_API_Name>'`. Legacy builder:
    the 18-character `0Xx…` id at the end of the agent's Setup URL. A bad id gives HTTP 400
    "… is not a valid agent ID" or a 500 `HttpServerErrorException`.
-5. **`bypassUser`.** `true` runs as the agent's assigned user (what you want with client
-   credentials); `false` runs as the token's user and needs a named-user token. It decides
-   whose record and field access the actions get.
+5. **`bypassUser`.** `true` runs as the agent's own user (`BotDefinition.BotUserId`);
+   `false` runs as the token's user. Every token is a user's token: a client-credentials
+   token belongs to the ECA's **Run As** user, a web-server-flow token to whoever signed
+   in. **Employee Agents have no agent user**, so `true` fails with HTTP 400 `Invalid user
+   ID provided on start session: `. Always send `false` for them (tested 2026-11-19). It
+   decides whose record and field access the actions get. **One ECA serves all users**;
+   the OAuth flow, not the ECA, picks the user. Details: `references/employee-agents.md`.
 6. **One request at a time per session.** A second call while one is in flight returns
    **HTTP 423** (session locked). Serialise turns; don't retry in parallel.
 7. **120-second timeout**, reported as **HTTP 500**. Keep slow actions out of a single turn.

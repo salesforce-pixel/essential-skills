@@ -25,6 +25,9 @@ at least one active agent.
 - [11. Considerations](#11-considerations)
 - [12. Troubleshooting](#12-troubleshooting)
 
+Calling an **Employee Agent**? Read `employee-agents.md` too: it needs `bypassUser: false`,
+and it covers the per-user web server flow (tested 2026-11-19).
+
 ## 1. External Client App
 
 Setup → External Client Apps Manager → New External Client App.
@@ -37,13 +40,17 @@ Setup → External Client Apps Manager → New External Client App.
 2. Tick **Enable Client Credentials Flow** and **Issue JSON Web Token (JWT)-based access
    tokens for named users**.
 3. Untick **Require secret for Web Server Flow**, **Require secret for Refresh Token Flow**
-   and **Require PKCE extension for Supported Authorization Flows**.
+   and **Require PKCE extension for Supported Authorization Flows**. (For browser or mobile
+   clients that sign users in, keep PKCE on; you still need no secret.)
+   The form also needs a **Callback URL**. Client credentials doesn't use it; the web server
+   flow redirects to it, and it must match `redirect_uri` exactly.
 4. Create. Then **Policy** tab → Edit → OAuth Flows and External Client App Enhancements →
    tick **Enable Client Credentials Flow** → set **Run As (Username)** to a user with at
    least API Only access → Save.
 5. **Settings** tab → OAuth Settings → **Consumer Key and Secret** → copy both.
 
 Any flow that yields a JWT-based access token works; client credentials is the simplest.
+One ECA can serve every user and several flows at once; you don't need one per user.
 
 ## 2. Token
 
@@ -58,6 +65,14 @@ curl https://{MY_DOMAIN_URL}/services/oauth2/token \
 `MY_DOMAIN_URL` = Setup → My Domain → **Current My Domain URL** (`*.my.salesforce.com`).
 Not the `*.lightning.force.com` host in the browser.
 
+The token is issued for the ECA's **Run As** user (JWT claim `sub` = `uid:<user Id>`, `aud`
+includes `https://api.salesforce.com`). To act as each person instead, use the web server
+flow with PKCE (`employee-agents.md#per-user-web-server-flow-with-pkce`).
+
+Only JWT-based tokens are accepted. A classic session ID (`00D…!…`, e.g. from
+`sf org display`) or no token at all gets a bare **HTTP 404 with an empty body** (tested
+2026-11-19). There is no guest or anonymous access.
+
 Response (shortened): `access_token` (JWT), `token_format: "jwt"`,
 `scope: "sfap_api chatbot_api api"`, `instance_url`, `api_instance_url:
 "https://api.salesforce.com"`, `token_type: "Bearer"`. If `scope` lacks `chatbot_api` or
@@ -70,12 +85,16 @@ Response (shortened): `access_token` (JWT), `token_format: "jwt"`,
 | New Agentforce Builder (Agentforce Studio, Canvas/Script view, Agent Script) | `SELECT Id, DeveloperName FROM BotDefinition WHERE DeveloperName = '<Agent_API_Name>'` — the `Id` (`0Xx…`) is the agent ID |
 | Legacy Agentforce Builder (Setup → Agentforce Agents) | The 18-character id at the end of the Agent Overview URL, e.g. `…/lightning/setup/EinsteinCopilot/0XxSB000000IPCr0AO/edit` |
 
-The `BotDefinition` query works for both, so prefer it in scripts:
+The `BotDefinition` query works for both, so prefer it in scripts. Include the type fields:
+they tell you which `bypassUser` value to send.
 
 ```bash
 sf data query -o <alias> --json \
-  -q "SELECT Id, DeveloperName, MasterLabel FROM BotDefinition WHERE DeveloperName = '<Agent_API_Name>'"
+  -q "SELECT Id, DeveloperName, MasterLabel, Type, AgentType, BotUserId FROM BotDefinition WHERE DeveloperName = '<Agent_API_Name>'"
 ```
+
+`AgentType = AgentforceEmployeeAgent` (`Type = InternalCopilot`) with `BotUserId` null is an
+Employee Agent → `bypassUser: false`. A service agent has a `BotUserId`.
 
 ## 4. Endpoints
 
@@ -109,7 +128,7 @@ curl -X POST https://api.salesforce.com/einstein/ai-agent/v1/agents/{AGENT_ID}/s
 | `externalSessionKey` | A UUID you generate. Use it to find the conversation in the agent's event logs. |
 | `instanceConfig.endpoint` | Your My Domain URL, with `https://`. Wrong value → `EngineConfigLookupException`. |
 | `streamingCapabilities.chunkTypes` | `["Text"]` to receive `TextChunk` events on the stream endpoint. |
-| `bypassUser` | `true`: run as the agent's assigned user. `false`: run as the token's user. With client credentials use `true`. |
+| `bypassUser` | `true`: run as the agent's own user (`BotUserId`). `false`: run as the token's user (the Run As user for client credentials, the signed-in user for the web server flow). Service agent with client credentials: either works. **Employee Agent: must be `false`** (`true` → HTTP 400, tested 2026-11-19). |
 | `variables` | Optional context and custom variables; see [Variables](#variables). |
 | `surfaceConfig` | `{"surfaceType": "Custom"}` to use a custom connection; see `custom-connections.md`. |
 
@@ -244,13 +263,18 @@ HTTP 201 = received. Stored in Data 360 with Generative AI Audit and Feedback da
 - **Government Cloud**: `api.gov.salesforce.com` everywhere.
 - **Access**: with `bypassUser: true` actions see what the agent user can see; with `false`
   they see what the token's user can see. Grant object, field and Apex class access to the
-  right user.
+  right user. Employee Agents always run as the token's user.
+- **Identity**: every caller is a Salesforce user: either one shared Run As user (client
+  credentials) or each person (web server flow). See `employee-agents.md` for the
+  trade-offs, including per-user licensing of Employee Agents.
 
 ## 12. Troubleshooting
 
 | Symptom | Cause / fix |
 |---|---|
 | 400, `{VALUE} is not a valid agent ID` | Wrong agent ID; re-query `BotDefinition` |
+| 400 `Invalid user ID provided on start session: ` (blank id) | `bypassUser: true` on an agent with no agent user (Employee Agent); send `false` |
+| 404, empty body, no headers | No token, or not a JWT (e.g. a CLI session ID); get a token from an ECA flow |
 | 401 | Token problem: wrong key/secret, client credentials not enabled on the Policy tab, no Run As user, missing scopes |
 | 404 | Wrong host or token; on Government Cloud you must call `api.gov.salesforce.com` |
 | 423 Session Already Locked | Another request on this session is still running; wait for it |
@@ -259,3 +283,5 @@ HTTP 201 = received. Stored in Data 360 with Generative AI Audit and Feedback da
 | 500 `HttpServerErrorException` | Wrong agent ID in the path |
 | 500 after ~120 s | Timeout; make the turn faster |
 | Reply flickers / garbled when streaming | You ignored `ValidationFailureChunk`; clear rendered chunks on it |
+| `redirect_uri_mismatch` at login (web server flow) | `redirect_uri` doesn't exactly match the ECA's Callback URL |
+| `CERTIFICATE_VERIFY_FAILED` (python.org Python on macOS) | `export SSL_CERT_FILE=/etc/ssl/cert.pem`; don't disable certificate checks |
